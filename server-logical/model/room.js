@@ -12,8 +12,10 @@ var roomdb = presist("rooms", {
 });
 
 //---EVENT EMITTERS
-var event_endpoint = require("events");
-var emitter = new event_endpoint.EventEmitter();
+var event_endpoint = require("eventemitter2");
+var emitter = new event_endpoint.EventEmitter2({
+    wildcard: true
+});
 roomstates.observe((changes) => {
     emitter.emit("states", changes);
 });

@@ -17,9 +17,10 @@ var machinedb = presist("machine", {
 
 //---LOGIC
 function __build_machine_states() {
-    for (var i in machinedb) {
+    for (var i in machinedb.data) {
         machinestates[i] = machinestates[i] || {
             session: false,
+            id: i,
             user_on_request: false,
             /** {
              *  started: Date.now()?
@@ -47,13 +48,13 @@ function machine_valid_for_session(id) {
         return false;
     }
     return !machinestates[id].session && (
-        !machinestates[id].user_on_request ||
-        Date.now() > machinestates[id].user_on_request.expire
+        (!machinestates[id].user_on_request ||
+        Date.now() > machinestates[id].user_on_request.expire)
     )
 }
 
 var MACHINE_GUARD_INTERVAL = 1000;
-var MACHINE_TIMEOUT = 1000 * 15;
+var MACHINE_TIMEOUT = 1000 * 5;
 
 function __guard_machine_quality() {
     for (var i in machinestates) {
@@ -78,15 +79,19 @@ function report_from_machine(machine_id, package) {
     if (!machinestates[machine_id]) return;
     for (var i in package) {
         if (machinestates[machine_id][i] != package[i]) {
+            console.log("update_property", i);
             machinestates[machine_id][i] = package[i];
         }
     }
+    machinestates[machine_id].up = true;
     machinestates[machine_id].last_update = Date.now();
 }
 
 //---EVENT EMITTERS
-var event_endpoint = require("events");
-var emitter = new event_endpoint.EventEmitter();
+var event_endpoint = require("eventemitter2");
+var emitter = new event_endpoint.EventEmitter2({
+    wildcard: true
+});
 machinestates.observe((changes) => {
     emitter.emit("states", changes);
 });
@@ -96,12 +101,10 @@ machinedb.event.on("observe", (changes) => {
 
 __build_machine_states();
 
-
 module.exports.db = machinedb;
 module.exports.events = emitter;
 module.exports.states = machinestates;
 module.exports.report_from_machine = report_from_machine;
 module.exports.machine_valid_for_session = machine_valid_for_session;
-
 
 presist.dump("machine-state", machinestates);

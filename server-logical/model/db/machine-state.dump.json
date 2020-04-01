@@ -1,0 +1,10 @@
+{
+    "test_machine": {
+        "up": true,
+        "last_update": 1585753095572,
+        "message": "",
+        "user_on_request": false,
+        "id": "test_machine",
+        "session": false
+    }
+}

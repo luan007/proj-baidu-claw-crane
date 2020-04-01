@@ -3,7 +3,7 @@ var STATS = {
 };
 
 var observer = require('./observer');
-var event = require('events').EventEmitter;
+var event = require('eventemitter2').EventEmitter2;
 var PATH = process.cwd() + '/db/';
 var THROTTLE = 100;
 var THROTTLE_DUMP = 500;
@@ -19,7 +19,9 @@ module.exports = function (name, default_val, readable) {
     readable = readable == undefined ? true : readable;
     var self = {
         data: default_val || {},
-        event: new event()
+        event: new event({
+            wildcard: true
+        })
     };
 
     var file = PATH + name + ".json";

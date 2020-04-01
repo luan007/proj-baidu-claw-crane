@@ -11,6 +11,7 @@
   "dependencies": {
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
+    "eventemitter2": "^6.3.1",
     "express": "^4.17.1",
     "object-observer": "^2.9.1",
     "on-change": "^2.0.1",

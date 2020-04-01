@@ -13,8 +13,10 @@ var userdb = presist("user", {});
 var tokendb = presist("token", {}); //login to uid token pairs
 
 //----EVENT EMITTERS
-var event_endpoint = require("events");
-var emitter = new event_endpoint.EventEmitter();
+var event_endpoint = require("eventemitter2");
+var emitter = new event_endpoint.EventEmitter2({
+    wildcard: true
+});
 userstates.observe((changes) => {
     emitter.emit("states", changes);
 });
@@ -156,9 +158,9 @@ function user_offline(uid) {
 }
 
 function add_coin(uid, count) {
-    if (!userdb[uid]) return -1;
-    userdb[uid].private.coin += count;
-    return userdb[uid].private.coin;
+    if (!userdb.data[uid]) return -1;
+    userdb.data[uid].private.coin += count;
+    return userdb.data[uid].private.coin;
 }
 
 var INVALIDATE_TOKEN_TIME = 1000;

@@ -128,15 +128,5 @@
         "machine": "test_machine",
         "ended": 1585753068905,
         "started": 1585753068905
-    },
-    "0.842044177487105": {
-        "id": 0.842044177487105,
-        "user": "15801397431",
-        "state": 0,
-        "gameresult": 5,
-        "countdown": 60,
-        "machine": "test_machine",
-        "ended": 1585753088913,
-        "started": 1585753088913
     }
 }
