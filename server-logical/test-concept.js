@@ -1,6 +1,7 @@
 var observer = require('./lib/observer');
 var j = observer.Observable.from({});
-
+j.test = [1,2,3];
+j.q = null;
 j.observe(changes => {
     changes.forEach(change => {
         console.log(change);
@@ -15,10 +16,14 @@ var sample = {
         asdf: 1
     }
 };
-j.test = {};
-j.test.asdf = 1;
-j.test.asdf = 3;
-j.test.asdf = 3;
+j.q = 3
+j.test.splice(2,1);
+j.q = 1;
+j.q = null;
+
+for(var i in j) {
+    delete j[i]
+}
 
 console.log(j.observe ? JSON.stringify(j) : 0);
 

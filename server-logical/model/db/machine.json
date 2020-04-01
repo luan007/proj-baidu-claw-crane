@@ -1,0 +1,12 @@
+{
+    "test_machine": {
+        "public": {
+            "intro": "test_machine"
+        },
+        "private": {
+            "key": 38193,
+            "uplink": "http://localhost:8081/test",
+            "downlink": "http://localhost:8082/"
+        }
+    }
+}

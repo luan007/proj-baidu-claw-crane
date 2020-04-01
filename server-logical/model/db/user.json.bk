@@ -1,0 +1,18 @@
+{
+    "15801397431": {
+        "uid": "15801397431",
+        "anwser_due": 0,
+        "anwser": 0.7423230887454499,
+        "quiz_token": "69813ddc-3abe-4968-befc-eb3569a15cb3",
+        "token": "c8ec0030-d869-4e90-88de-1303ddea26cc",
+        "sessions": {},
+        "private": {
+            "pickup_info": "",
+            "coin": 0
+        },
+        "public": {
+            "settings": "",
+            "name": ""
+        }
+    }
+}

@@ -2,6 +2,7 @@
 var uuid = require('uuid');
 
 //---DATA BASE
+var Observable = require("../lib/observer").Observable;
 var presist = require("../lib/presist");
 var userstates = Observable.from({}); //runtime stuff
 function __ensure_user_state(uid) {
@@ -14,7 +15,6 @@ var tokendb = presist("token", {}); //login to uid token pairs
 //----EVENT EMITTERS
 var event_endpoint = require("events");
 var emitter = new event_endpoint.EventEmitter();
-var Observable = require("../lib/observer").Observable;
 userstates.observe((changes) => {
     emitter.emit("states", changes);
 });
@@ -31,6 +31,17 @@ function is_user_phone_legal(phone_or_uid) {
     return reg.test(phone_or_uid);
 }
 
+function user_is_up(uid) {
+    return userstates[uid] && userstates[uid].up;
+}
+
+function user_valid_for_session(uid) {
+    if (user_is_up(uid) && !userstates[uid].session) {
+        return true;
+    }
+    return false;
+}
+
 function get_or_create_user_by_uid(phone_or_uid) {
     if (!is_user_phone_legal) {
         return null;
@@ -45,12 +56,14 @@ function get_or_create_user_by_uid(phone_or_uid) {
             coin: 0,
             pickup_info: ""
         },
+        sessions: {},
         token: Math.random(),
         quiz_token: "",
         anwser: Math.random(),
         anwser_due: 0,
         uid: phone_or_uid,
     };
+    return userdb.data[phone_or_uid];
 }
 
 function invalidate_token(token) {
@@ -81,6 +94,8 @@ function get_current_user(token) {
     return userdb.data[tokenuid];
 }
 
+
+
 function is_logged_in(token) {
     return get_current_user(token) != null;
 }
@@ -96,7 +111,7 @@ function login_quiz(uid) {
         user.anwser_due = Date.now() + 120 * 1000;
         user.anwser = 9999;
         user.quiz_token = uuid.v4();
-        console.log("TODO: Impl SMS Check here");
+        // console.log("TODO: Impl SMS Check here");
         return user.quiz_token;
     }
     return false;
@@ -140,6 +155,25 @@ function user_offline(uid) {
     emitter.emit("down", uid);
 }
 
+function add_coin(uid, count) {
+    if (!userdb[uid]) return -1;
+    userdb[uid].private.coin += count;
+    return userdb[uid].private.coin;
+}
+
+var INVALIDATE_TOKEN_TIME = 1000;
+
+function __invalidate_token_guard() {
+    for (var i in tokendb.data) {
+        if (Date.now() > tokendb.data[i].expire ||
+            userdb.data[tokendb.data[i].uid].token != i) {
+            invalidate_token(i);
+        }
+    }
+}
+
+setInterval(__invalidate_token_guard, INVALIDATE_TOKEN_TIME);
+
 //---EXPORTS
 
 module.exports.db = userdb;
@@ -148,6 +182,7 @@ module.exports.states = userstates;
 
 module.exports.events = emitter;
 
+module.exports.add_coin = add_coin;
 module.exports.login = login;
 module.exports.login_quiz = login_quiz;
 module.exports.logout = logout;
@@ -158,3 +193,6 @@ module.exports.get_or_create_user_by_uid = get_or_create_user_by_uid;
 module.exports.is_user_phone_legal = is_user_phone_legal;
 module.exports.user_online = user_online;
 module.exports.user_offline = user_offline;
+module.exports.user_valid_for_session = user_valid_for_session;
+
+presist.dump("user-state", userstates);
