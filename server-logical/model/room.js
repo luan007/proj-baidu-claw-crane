@@ -1,5 +1,6 @@
 //---INCLUDES
 var users = require("./user");
+var machines = require("./machine");
 
 //---DATA BASE
 var presist = require("../lib/presist");
@@ -7,7 +8,9 @@ var Observable = require("../lib/observer").Observable;
 var roomstates = Observable.from({}); //runtime stuff
 var roomdb = presist("rooms", {
     demo_room: {
-        machine: "demo_machine"
+        machine: "demo_machine",
+        machine_up: false,
+        machine_session: false
     }
 });
 
@@ -113,12 +116,26 @@ users.events.on("up", (uid) => {
     __update_singular_user(uid);
 });
 
+//aggregate 
+machines.events.on("states", (changes) => {
+    //user_on_request
+    //session
+    //up
+    //message
+    
+});
+
 __build_room_states();
 
 module.exports.events = emitter;
 module.exports.db = roomdb;
 module.exports.states = roomstates;
-
+module.exports.get_room_id_from_machine = function(machine) {
+    for(var i in roomdb.data) {
+        if(roomdb.data[i].machine == i) return i;
+    }
+    return null;
+}
 module.exports.sendChat = sendChat;
 module.exports.recompute_room_states = recompute_room_states;
 

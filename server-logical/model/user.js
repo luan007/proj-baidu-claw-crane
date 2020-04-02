@@ -1,5 +1,15 @@
 //---INCLUDES
 var uuid = require('uuid');
+var crypto = require('crypto');
+
+var SALT = "EM_X"
+
+function hash_uid(s) {
+    var md5 = crypto.createHash('md5').update(SALT + s).digest('hex').toString();
+    return md5;
+}
+
+module.exports.hash_uid = hash_uid;
 
 //---DATA BASE
 var Observable = require("../lib/observer").Observable;
@@ -45,11 +55,12 @@ function user_valid_for_session(uid) {
 }
 
 function get_or_create_user_by_uid(phone_or_uid) {
-    if (!is_user_phone_legal) {
+    if (!is_user_phone_legal(phone_or_uid)) {
         return null;
     }
-    __ensure_user_state(phone_or_uid);
-    userdb.data[phone_or_uid] = userdb.data[phone_or_uid] || {
+    var huid = hash_uid(phone_or_uid);
+    __ensure_user_state(huid);
+    userdb.data[huid] = userdb.data[huid] || {
         public: {
             name: "",
             settings: ""
@@ -63,9 +74,10 @@ function get_or_create_user_by_uid(phone_or_uid) {
         quiz_token: "",
         anwser: Math.random(),
         anwser_due: 0,
-        uid: phone_or_uid,
+        mobile: phone_or_uid,
+        uid: huid,
     };
-    return userdb.data[phone_or_uid];
+    return userdb.data[huid];
 }
 
 function invalidate_token(token) {

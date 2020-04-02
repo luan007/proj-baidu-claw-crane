@@ -2,7 +2,6 @@ var machines = require("./machine");
 var rooms = require("./room");
 var sessions = require("./session");
 var users = require("./user");
-
 // machines.events.onAny((nm, c) => {
 //     console.log('EVT - MACHINE', nm)
 //     Array.isArray(c) ? null : console.log(c)
@@ -13,6 +12,7 @@ rooms.events.onAny((nm, c) => {
 })
 sessions.events.onAny((nm, c) => {
     console.log('EVT - SESSION', nm)
+    console.log(c);
     Array.isArray(c) ? null : console.log(c)
 })
 users.events.onAny((nm, c) => {
@@ -97,12 +97,12 @@ machines.report_from_machine("test_machine", {});
 setInterval(() => {
     machines.report_from_machine("test_machine", {});
 }, 500)
-console.log(sessions.request_new_session("15801397431", "test_machine", 1));
-console.log(sessions.request_new_session("15801397431", "test_machine", 1));
-console.log(sessions.request_new_session("15801397431", "test_machine", 1));
-console.log(sessions.request_new_session("15801397431", "test_machine", 1));
-console.log(sessions.request_new_session("15801397431", "test_machine", 1));
-console.log(sessions.request_new_session("15801397431", "test_machine", 1));
+console.log(sessions.request_new_session(userid, "test_machine", 1));
+console.log(sessions.request_new_session(userid, "test_machine", 1));
+console.log(sessions.request_new_session(userid, "test_machine", 1));
+console.log(sessions.request_new_session(userid, "test_machine", 1));
+console.log(sessions.request_new_session(userid, "test_machine", 1));
+console.log(sessions.request_new_session(userid, "test_machine", 1));
 
 
 setInterval(v => {
@@ -114,5 +114,5 @@ setInterval(v => {
 
 console.log("IO", perf.IO);
 setTimeout(() => {
-    console.log(sessions.request_new_session("15801397431", "test_machine", 1));
+    console.log(sessions.request_new_session(userid, "test_machine", 1));
 }, 20000);

@@ -9,8 +9,8 @@ var machinedb = presist("machine", {
         },
         private: {
             key: 38193, //optional
-            uplink: "http://localhost:8081/test",
-            downlink: "http://localhost:8082/"
+            push_streams: ["http://localhost:8081/test"],
+            view_streams: ["http://localhost:8082/"]
         }
     }
 });

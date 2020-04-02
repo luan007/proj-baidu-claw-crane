@@ -21,6 +21,10 @@ var ACTIVE = 1;
 var HISTORY = 2;
 var BAD = 3;
 
+module.exports.ACTIVE = ACTIVE;
+module.exports.HISTORY = HISTORY;
+module.exports.BAD = BAD;
+
 function session_status(id) {
     if (activesessions.data[id]) return ACTIVE;
     if (historysession.data[id]) return HISTORY;
@@ -37,10 +41,12 @@ function __active_session_down(i) {
     var session_obj = activesessions.data[i]
     if (activesessions.data[i] && !historysession.data[i]) {
         historysession.data[i] = JSON.parse(JSON.stringify(activesessions.data[i]));
+        historysession.data[i].history = true;
         emitter.emit("session_down", activesessions.data[i]);
         delete activesessions.data[i];
     }
-    if (session_obj && users.states[session_obj.user] && users.states[session_obj.user].session == i) {
+    if (session_obj && users.states[session_obj.user] && users.states[session_obj.user].session
+        && users.states[session_obj.user].session.id == i) {
         users.states[session_obj.user].session = false;
     }
 }
@@ -89,7 +95,11 @@ function __session_up(id, session_obj) {
         users.db.data[session_obj.user].sessions[id] = Date.now();
     }
     if (users.states[session_obj.user]) {
-        users.states[session_obj.user].session = id;
+        users.states[session_obj.user].session = {
+            id: id,
+            private_key: Math.random(),
+            machine: session_obj.machine
+        };
     }
     emitter.emit("session_up", activesessions.data[id]);
 }
@@ -142,8 +152,8 @@ function request_new_session(uid, machine_id, cost) {
 }
 
 function from_user(uid) {
-    if (!users.states[uid] || !users.states[uid].session) return null;
-    var sid = users.states[uid].session;
+    if (!users.states[uid] || !users.states[uid].session || !users.states[uid].session.id) return null;
+    var sid = users.states[uid].session.id;
     if (session_status(sid) == ACTIVE ) {
         var session = activesessions.data[sid];
         if(session.user == uid) {
