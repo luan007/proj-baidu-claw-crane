@@ -59,7 +59,6 @@ function simulate_a_game(id, user, session_id) {
     }, 5500);
 }
 
-
 machines.events.on("states", (c) => {
     c.forEach(v => {
         if (v.path.indexOf("user_on_request") > -1) {
@@ -114,7 +113,6 @@ setInterval(v => {
 }, 100);
 
 console.log("IO", perf.IO);
-
 setTimeout(() => {
     console.log(sessions.request_new_session("15801397431", "test_machine", 1));
 }, 20000);
