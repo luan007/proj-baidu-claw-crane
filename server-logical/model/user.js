@@ -105,6 +105,7 @@ function get_current_user(token) {
         invalidate_token(token);
         return null;
     }
+    __ensure_user_state(tokenuid);
     return userdb.data[tokenuid];
 }
 
@@ -140,8 +141,10 @@ function login(quiz_token, anwser, useragent) {
             break;
         }
     }
+
     if (!found) return false;
-    if (Date.now() > userdb.data[i].anwser_due || userdb.data[i].anwser !== anwser) {
+    // console.log(Date.now() > userdb.data[i].anwser_due || userdb.data[i].anwser.toString() != anwser.toString());
+    if (Date.now() > userdb.data[i].anwser_due || userdb.data[i].anwser.toString() != anwser.toString()) {
         return false;
     }
     userdb.data[i].anwser_due = 0;

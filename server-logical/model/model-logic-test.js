@@ -104,11 +104,11 @@ console.log(sessions.request_new_session(userid, "test_machine", 1));
 console.log(sessions.request_new_session(userid, "test_machine", 1));
 console.log(sessions.request_new_session(userid, "test_machine", 1));
 
-
 setInterval(v => {
     //as a user, checking if me got the permission to control
     if (sessions.from_user(userid)) {
         console.log("USER CAN CONTROL MACHINE")
+        console.log(sessions.from_user(userid).machine);
     }
 }, 100);
 

@@ -5,15 +5,18 @@ var machinestates = Observable.from({}); //runtime stuff
 var machinedb = presist("machine", {
     test_machine: {
         public: {
-            intro: "test_machine"
+            intro: "test_machine",
+            view_streams: ["http://localhost:8082/"]
         },
         private: {
             key: 38193, //optional
             push_streams: ["http://localhost:8081/test"],
-            view_streams: ["http://localhost:8082/"]
         }
     }
 });
+
+
+
 
 //---LOGIC
 function __build_machine_states() {
@@ -49,7 +52,7 @@ function machine_valid_for_session(id) {
     }
     return !machinestates[id].session && (
         (!machinestates[id].user_on_request ||
-        Date.now() > machinestates[id].user_on_request.expire)
+            Date.now() > machinestates[id].user_on_request.expire)
     )
 }
 
@@ -66,9 +69,10 @@ function __guard_machine_quality() {
     }
 }
 setInterval(__guard_machine_quality, MACHINE_GUARD_INTERVAL);
+
 function __guard_machine_user_on_request() {
     for (var i in machinestates) {
-        if(machinestates[i].user_on_request && Date.now() > machinestates[i].user_on_request.expire) {
+        if (machinestates[i].user_on_request && Date.now() > machinestates[i].user_on_request.expire) {
             machinestates[i].user_on_request = false;
         }
     }
@@ -101,9 +105,19 @@ machinedb.event.on("observe", (changes) => {
 
 __build_machine_states();
 
+function send_command(machine_id, cmd) {
+    if (machinestates[machine_id] && machinestates[machine_id].up) {
+        emitter.emit("ctrl", {
+            machine: machine_id,
+            cmd: cmd
+        })
+    }
+}
+
 module.exports.db = machinedb;
 module.exports.events = emitter;
 module.exports.states = machinestates;
+module.exports.send_command = send_command;
 module.exports.report_from_machine = report_from_machine;
 module.exports.machine_valid_for_session = machine_valid_for_session;
 

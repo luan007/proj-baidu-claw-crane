@@ -8,9 +8,7 @@ var Observable = require("../lib/observer").Observable;
 var roomstates = Observable.from({}); //runtime stuff
 var roomdb = presist("rooms", {
     demo_room: {
-        machine: "demo_machine",
-        machine_up: false,
-        machine_session: false
+        machine: "test_machine"
     }
 });
 
@@ -25,6 +23,7 @@ roomstates.observe((changes) => {
 roomdb.event.on("observe", (changes) => {
     emitter.emit("db", changes);
 });
+
 
 function __build_room_states() {
     for (var i in roomdb.data) {
@@ -62,6 +61,12 @@ function __recompute_room_state(room_id) {
     }
 }
 
+function get_room_id_from_machine(machine) {
+    for(var i in roomdb.data) {
+        if(roomdb.data[i].machine == machine) return i;
+    }
+    return null;
+}
 function recompute_room_states() {
     //from user state -> room state
     for (var i in users.states) {
@@ -122,7 +127,41 @@ machines.events.on("states", (changes) => {
     //session
     //up
     //message
-    
+    changes.forEach(v=>{
+        var dev = v.path[0];
+        var machine = machines.states[dev];
+        var room = get_room_id_from_machine(machine.id);
+        if(!room) return;
+        roomstates[room].machine_up = machine.up;
+        roomstates[room].machine_message = machine.message;
+        if(v.path.indexOf("session") || v.path.indexOf("user_on_request") >= 0) {
+            //directly sync
+            roomstates[room].session = machine.session;
+            roomstates[room].user_on_request = machine.user_on_request;
+        }
+        /**
+         *     "test_machine": {
+        "up": true,
+        "last_update": 1585812385323,
+        "message": "",
+        "user_on_request": {
+            "expire": 1585812388819,
+            "user": "77b32c7d17fac691ca7692f9dabb713b"
+        },
+        "id": "test_machine",
+        "session": {
+            "id": 0.4887547391775393,
+            "user": "77b32c7d17fac691ca7692f9dabb713b",
+            "state": 0,
+            "gameresult": -5,
+            "countdown": 60,
+            "machine": "test_machine",
+            "ended": 0,
+            "started": 1585812384819
+        }
+    }
+         */
+    });
 });
 
 __build_room_states();
@@ -130,14 +169,8 @@ __build_room_states();
 module.exports.events = emitter;
 module.exports.db = roomdb;
 module.exports.states = roomstates;
-module.exports.get_room_id_from_machine = function(machine) {
-    for(var i in roomdb.data) {
-        if(roomdb.data[i].machine == i) return i;
-    }
-    return null;
-}
+module.exports.get_room_id_from_machine = get_room_id_from_machine;
 module.exports.sendChat = sendChat;
 module.exports.recompute_room_states = recompute_room_states;
-
 
 presist.dump("room-state", roomstates);
