@@ -5,8 +5,31 @@ var machinestates = Observable.from({}); //runtime stuff
 var machinedb = presist("machine", {
     test_machine: {
         public: {
+            cost: 2,
             intro: "test_machine",
-            view_streams: ["http://localhost:8082/"]
+            view_streams: ["ws://localhost:8082/"]
+        },
+        private: {
+            key: 38193, //optional
+            push_streams: ["http://localhost:8081/test"],
+        }
+    },
+    test_machine2: {
+        public: {
+            cost: 2,
+            intro: "test_machine2",
+            view_streams: ["ws://localhost:8082/"]
+        },
+        private: {
+            key: 38193, //optional
+            push_streams: ["http://localhost:8081/test"],
+        }
+    },
+    test_machine3: {
+        public: {
+            cost: 2,
+            intro: "test_machine3",
+            view_streams: ["ws://localhost:8082/"]
         },
         private: {
             key: 38193, //optional

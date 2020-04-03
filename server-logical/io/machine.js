@@ -2,11 +2,12 @@ var machines = require("../model/machine");
 
 
 setInterval(() => {
-    for (var i in machines.states) {
-        machines.report_from_machine(
-            i, {});
-    }
-
+    // for (var i in machines.states) {
+    //     machines.report_from_machine(
+    //         i, {});
+    // }
+    machines.report_from_machine(
+        "test_machine", {});
 }, 500);
 
 
@@ -46,4 +47,8 @@ machines.events.on("states", (changes) => {
             })(i);
         }
     }
+});
+
+machines.events.on("ctrl", (c) => {
+    console.log(c);
 });

@@ -1,9 +1,12 @@
 <template>
   <div>
-    <div v-if="login.login==-1" class="fullscreen">
+    <div v-if="channel.connected <= 0" class="fullscreen">
+      <div class="center">实时连接被断开<br>重新连接中</div>
+    </div>
+    <div v-if="login.login==-1" class="fullscreen" style="background: white">
       <div class="center">正在检查登录信息...</div>
     </div>
-    <div v-if="login.login==0" class="fullscreen">
+    <div v-if="login.login==0" class="fullscreen" style="background: white">
       <div class="center">
         <h3>登录</h3>
         <div class="line" v-if="!login.login_token">
@@ -27,7 +30,7 @@
 import { actions } from "./shared_actions";
 
 export default {
-  props: ["login"],
+  props: ["login", "channel"],
   methods: actions,
   mounted: () => {
     actions.is_logged_in();

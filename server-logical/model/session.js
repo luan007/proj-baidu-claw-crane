@@ -127,7 +127,7 @@ setInterval(__session_sweep, SWEEP_DEAD_SESSION_INTERVAL);
 
 var SESSION_REQ_EXPIRE = 5000;
 
-function request_new_session(uid, machine_id, cost) {
+function request_new_session(uid, machine_id) {
     //valid?
     var user = users.db.data[uid];
     var machine = machines.states[machine_id];
@@ -140,7 +140,8 @@ function request_new_session(uid, machine_id, cost) {
     if (!users.user_valid_for_session(uid)) {
         return -3;
     }
-    if (user.private.coin > cost) {
+    var cost = machines.db.data[machine_id].cost || 1;
+    if (user.private.coin >= cost) {
         user.private.coin -= cost;
         machine.user_on_request = {
             user: uid,

@@ -1,11 +1,14 @@
 //misc
 var TOKEN_COOKIE_KEY = 'EM_I_TOKEN';
 var cookie = require('cookie');
+var cors = require("cors");
 var throttle = require("../lib/throttle");
 var app = require('express')();
 var bodyParser = require('body-parser');
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
+
+app.use(cors());
 
 io.use(require('socket.io-cookie-parser')());
 
@@ -267,8 +270,8 @@ app.post("/actions/stage2_login", (req, res) => {
         }).end();
     }
     res.cookie(TOKEN_COOKIE_KEY, result, {
-        maxAge: 999999,
-        expires: false,
+        maxAge: 60 * 60 * 1000 * 24,
+        expires: new Date(Date.now() + 60 * 60 * 1000 * 24),
         httpOnly: true
     });
     return res.json({
@@ -341,7 +344,7 @@ app.post("/actions/add_coin", (req, res) => {
 });
 
 app.post("/actions/start_game/:machine_id", (req, res) => {
-    var sess = sessions.request_new_session(req.user.uid, req.params.machine_id, 1);
+    var sess = sessions.request_new_session(req.user.uid, req.params.machine_id);
     console.log("Starting", sess);
     if (sess) {
         return res.json({

@@ -13,7 +13,7 @@ var app = new Vue({
     data: shared.local_state,
     computed: {
         not_logged_in: () => {
-            return local_state.login.login <= 0;
+            return local_state.login.login <= 0 || shared.local_state.channel.connected <= 0;
         },
         location: () => {
             //check fuckin room

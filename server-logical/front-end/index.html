@@ -72,7 +72,7 @@
 
 <body>
     <div id="app">
-        <login v-show="not_logged_in" :login="login"></login>
+        <login v-show="not_logged_in" :channel="channel" :login="login"></login>
         <debug :channel="channel" :synced="synced" :show_synced='true'></debug>
         <div v-if="!not_logged_in">
             <lobby :synced="synced" v-if="location == ''"></lobby>
@@ -80,6 +80,7 @@
             <common-avatar :synced="synced"></common-avatar>
         </div>
     </div>
+    <script src="./src/jsmpeg.js"></script>
     <script src="./src/main.js"></script>
 </body>
 

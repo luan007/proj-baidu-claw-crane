@@ -14,7 +14,8 @@ module.exports.hash_uid = hash_uid;
 //---DATA BASE
 var Observable = require("../lib/observer").Observable;
 var presist = require("../lib/presist");
-var userstates = Observable.from({}); //runtime stuff
+var userstates_raw = presist("userstate", {});//Observable.from({}); //runtime stuff
+var userstates = userstates_raw.data; //Observable.from({}); //runtime stuff
 function __ensure_user_state(uid) {
     userstates[uid] = userstates[uid] || {};
 }
@@ -27,7 +28,10 @@ var event_endpoint = require("eventemitter2");
 var emitter = new event_endpoint.EventEmitter2({
     wildcard: true
 });
-userstates.observe((changes) => {
+// userstates.observe((changes) => {
+//     emitter.emit("states", changes);
+// });
+userstates_raw.event.on("observe", (changes) => {
     emitter.emit("states", changes);
 });
 userdb.event.on("observe", (changes) => {
@@ -212,4 +216,4 @@ module.exports.user_online = user_online;
 module.exports.user_offline = user_offline;
 module.exports.user_valid_for_session = user_valid_for_session;
 
-presist.dump("user-state", userstates);
+// presist.dump("user-state", userstates);

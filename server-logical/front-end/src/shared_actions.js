@@ -12,6 +12,7 @@ export var synced = {
     session: null,
     state: {}
 };
+
 export var local_state = {
     generic_error: "",
     channel: {
@@ -30,9 +31,10 @@ export var local_state = {
 };
 
 export function active_game_in_room() {
+    console.log(synced.state, synced.state.session)
     if (synced.state && synced.state.session) {
         for (var i in synced.room_states) {
-            if (synced.room_states[i].session.id == synced.state.session.id) {
+            if (synced.room_states[i].session && synced.room_states[i].session.id == synced.state.session.id) {
                 return i;
             }
         }
@@ -82,6 +84,10 @@ main_socket.on("error", (e) => {
     console.log('Socket Error:', e);
     local_state.channel.debug = [];
     local_state.channel.connected = -1;
+
+    actions.is_logged_in(); //check again!
+    //auth failed
+
 });
 
 
@@ -90,6 +96,7 @@ main_socket.on("disconnect", () => {
     local_state.channel.debug = [];
     local_state.channel.log = "datastream: lost";
     local_state.channel.connected = -2;
+    actions.is_logged_in(); //check again!
 });
 
 
@@ -127,7 +134,15 @@ export function request_promise(action, data) {
 
 window.request_promise = request_promise;
 
+function is_in_game() {
+    return !!synced.state.session && 
+    synced.state.room_id &&
+    synced.room_states[synced.state.room_id].session && 
+    synced.room_states[synced.state.room_id].session.id == synced.state.session.id;
+}
+
 export var actions = {
+    is_in_game: is_in_game,
     is_logged_in: () => {
         request_promise("is_logged_in", {})
             .then(d => {
@@ -207,6 +222,46 @@ export var actions = {
     },
     send_chat: (pack) => {
         main_socket.emit("chat", pack);
+    },
+    send_cmd: (pack) => {
+        //ready?
+        if (is_in_game()) {
+            console.log("streaming control", pack);
+            main_socket.emit("control", pack);
+        }
+    },
+    get_room_state(room_id) {
+        if (!synced.room_states[room_id]) {
+            return {
+                state: 404,
+                message: "❓",
+                error: true
+            };
+        };
+        if (synced.room_states[room_id]) {
+            if (synced.room_states[room_id].session) {
+                return {
+                    state: 2,
+                    message: "⏳"
+                };
+            }
+            if (synced.room_states[room_id].machine_up) {
+                return {
+                    state: 1,
+                    message: "🎮"
+                };
+            } else {
+                return {
+                    state: -1,
+                    message: "❌"
+                };
+            }
+        };
+        return {
+            state: 500,
+            message: "❓",
+            error: true
+        };
     }
 };
 

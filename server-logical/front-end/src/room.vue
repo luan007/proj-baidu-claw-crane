@@ -1,12 +1,15 @@
 <template>
   <div>
     <div class="fullscreen">
+      <streamer src="ws://localhost:8082/"></streamer>
+    </div>
+    <div class="fullscreen">
       <div class="center">
         <div>
           <b>{{synced.state.room_id}}</b>
         </div>
         <div>在线用户: {{room_state.users}}</div>
-        <div v-if="!game">
+        <div v-if="!is_in_game()">
           <button v-on:click="join_room('0')">退出房间</button>
           <br />
           <button
@@ -14,14 +17,12 @@
             v-for="n in ['😊','😱','💪','💣']"
             v-on:click="send_chat({emoji: n})"
           >{{n}}</button>
-
           <br />
-          <button v-if="available" v-on:click="start_game(current_machine)">🎮上机</button>
+          <button v-if="available" v-on:click="start_game(current_machine)">🎮上机 (💰{{current_machine_cost}})</button>
         </div>
-        <div v-if="game">GGGAYYYME</div>
+        <in-game-control v-if="is_in_game()"></in-game-control>
       </div>
     </div>
-
     <div class="fullscreen" style="pointer-events:none">
       <chat-bubble v-bind:pack="n.pack" v-bind:pos="n.pos" v-for="n in chats"></chat-bubble>
     </div>
@@ -67,7 +68,10 @@ export default {
   methods: actions,
   computed: {
     current_machine: function() {
-        return this.room.machine;
+      return this.room.machine;
+    },
+    current_machine_cost: function() {
+      return this.synced.machines[this.room.machine].cost || 1;
     },
     available: function() {
       var room_state = this.room_state;
@@ -79,7 +83,8 @@ export default {
         !room_state.user_on_request
       );
     },
-    game: function() {
+    in_game: function() {
+      console.log(active_game_in_room(), synced.state.room_id)
       return active_game_in_room() == synced.state.room_id;
     },
     room: function() {

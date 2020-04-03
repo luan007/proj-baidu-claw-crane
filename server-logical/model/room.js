@@ -9,6 +9,12 @@ var roomstates = Observable.from({}); //runtime stuff
 var roomdb = presist("rooms", {
     demo_room: {
         machine: "test_machine"
+    },
+    demo_room2: {
+        machine: "test_machine2"
+    },
+    demo_room3: {
+        machine: "test_machine3"
     }
 });
 
@@ -46,10 +52,10 @@ function __recompute_room_state(room_id) {
     var new_list = [];
     var overlap_count = 0;
     for (i in users.states) {
-        var user = users.states[uid];
+        var user = users.states[i];
         if (user && user.room_id == room_id && user.up) {
-            new_list.push(uid);
-            if (current_users.indexOf(uid)) {
+            new_list.push(i);
+            if (current_users.indexOf(i)) {
                 overlap_count++;
             }
         }
