@@ -140,7 +140,7 @@ function request_new_session(uid, machine_id) {
     if (!users.user_valid_for_session(uid)) {
         return -3;
     }
-    var cost = machines.db.data[machine_id].cost || 1;
+    var cost = machines.db.data[machine_id].public.cost || 1;
     if (user.private.coin >= cost) {
         user.private.coin -= cost;
         machine.user_on_request = {

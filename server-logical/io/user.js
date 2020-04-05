@@ -11,7 +11,7 @@ var io = require('socket.io')(server);
 app.use(cors());
 
 io.use(require('socket.io-cookie-parser')());
-
+app.use("/models", require('serve-static')(process.cwd() + "/front-end/models"));
 app.use(require('serve-static')(process.cwd() + "/front-end/dist"));
 app.use(bodyParser.json());
 app.use(require("cookie-parser")())

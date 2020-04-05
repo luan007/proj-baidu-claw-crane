@@ -6,12 +6,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tester</title>
     <style>
+        #app {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+        }
+        * {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+        }
+
+        input {
+            user-select: all !important;
+            -webkit-user-select: all !important;
+        }
+
         body {
             margin: 0;
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
-
 
         input,
         div {
@@ -62,10 +79,12 @@
             right: 1rem;
             pointer-events: none;
         }
+
         .debug * {
             text-align: left;
             margin-bottom: 0.3rem;
-            font-size: 0.6rem; opacity: 0.5;
+            font-size: 0.6rem;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -73,12 +92,27 @@
 <body>
     <div id="app">
         <login v-show="not_logged_in" :channel="channel" :login="login"></login>
-        <debug :channel="channel" :synced="synced" :show_synced='true'></debug>
+        <!-- <debug :channel="channel" :synced="synced" :show_synced='true'></debug> -->
         <div v-if="!not_logged_in">
             <lobby :synced="synced" v-if="location == ''"></lobby>
             <room :synced="synced" v-if="location == 'room'"></room>
             <common-avatar :synced="synced"></common-avatar>
         </div>
+        <div class='fullscreen' style="background:black; color: white;" v-if="ai_engine.engine_state <= 0">
+            <div class="center" v-if="ai_engine.engine_state == -1">
+                平台不支持视频捕捉，请在浏览器内打开
+            </div>
+            <div class="center" v-if="ai_engine.engine_state == -2">
+                未允许视频权限，无法开启游戏
+            </div>
+            <div class="center" v-if="ai_engine.engine_state == -3">
+                人脸引擎加载失败，请刷新重试
+            </div>
+            <div class="center" v-if="ai_engine.engine_state == 0">
+                引擎启动中
+            </div>
+        </div>
+        <face-recog v-else></face-recog>
     </div>
     <script src="./src/jsmpeg.js"></script>
     <script src="./src/main.js"></script>

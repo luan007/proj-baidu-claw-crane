@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="fullscreen">
-      <streamer src="ws://localhost:8082/"></streamer>
+      <streamer v-bind:src="src"></streamer>
     </div>
     <div class="fullscreen">
       <div class="center">
@@ -67,11 +67,15 @@ export default {
   },
   methods: actions,
   computed: {
+    src: function() {
+      console.log(this.synced.machines[this.room.machine].public.view_streams[0]);
+      return "ws://192.168.1.111:8082/" // this.synced.machines[this.room.machine].public.view_streams[0];
+    },
     current_machine: function() {
       return this.room.machine;
     },
     current_machine_cost: function() {
-      return this.synced.machines[this.room.machine].cost || 1;
+      return this.synced.machines[this.room.machine].public.cost || 1;
     },
     available: function() {
       var room_state = this.room_state;

@@ -11,6 +11,7 @@ for (var i in comps) {
 var app = new Vue({
     el: '#app',
     data: shared.local_state,
+    methods: shared.actions,
     computed: {
         not_logged_in: () => {
             return local_state.login.login <= 0 || shared.local_state.channel.connected <= 0;

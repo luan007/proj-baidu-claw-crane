@@ -4,7 +4,7 @@
       <div class="center">
         <h3>LOBBY</h3>
         <div v-for="r, k in synced.room_states" class="line">
-            <button v-on:click="join_room(k)">JOIN {{k}} 在线={{r.users}} {{get_room_state(k).message}}</button>
+            <button v-on:click="join_room(k)">JOIN {{k}} 在线 ({{r.users}}) {{get_room_state(k).message}}</button>
         </div>
       </div>
     </div>

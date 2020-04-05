@@ -4,6 +4,7 @@ var Observable = require("../lib/observer").Observable;
 var machinestates = Observable.from({}); //runtime stuff
 var machinedb = presist("machine", {
     test_machine: {
+        id: 'test_machine',
         public: {
             cost: 2,
             intro: "test_machine",
@@ -11,10 +12,12 @@ var machinedb = presist("machine", {
         },
         private: {
             key: 38193, //optional
+            token: "super_secret_key",
             push_streams: ["http://localhost:8081/test"],
         }
     },
     test_machine2: {
+        id: 'test_machine2',
         public: {
             cost: 2,
             intro: "test_machine2",
@@ -26,6 +29,7 @@ var machinedb = presist("machine", {
         }
     },
     test_machine3: {
+        id: 'test_machine3',
         public: {
             cost: 2,
             intro: "test_machine3",

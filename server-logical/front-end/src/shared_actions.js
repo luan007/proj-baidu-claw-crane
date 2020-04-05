@@ -14,6 +14,10 @@ export var synced = {
 };
 
 export var local_state = {
+    ai_engine: {
+        face_data: {},
+        engine_state: 0
+    },
     generic_error: "",
     channel: {
         connected: false,
@@ -77,6 +81,7 @@ main_socket.on("connect", (e) => {
     local_state.channel.log = "datastream: connected";
     local_state.channel.debug = [];
     local_state.channel.connected = 1;
+    actions.is_logged_in(); //check again!
 });
 
 main_socket.on("error", (e) => {
@@ -84,12 +89,10 @@ main_socket.on("error", (e) => {
     console.log('Socket Error:', e);
     local_state.channel.debug = [];
     local_state.channel.connected = -1;
-
     actions.is_logged_in(); //check again!
     //auth failed
 
 });
-
 
 main_socket.on("disconnect", () => {
     console.log("disconnected.")
@@ -98,8 +101,6 @@ main_socket.on("disconnect", () => {
     local_state.channel.connected = -2;
     actions.is_logged_in(); //check again!
 });
-
-
 
 export function change_login_state() {
     if (local_state.login.login == -1 || local_state.login.login == 0) {
@@ -113,7 +114,6 @@ export function change_login_state() {
         } catch (e) {}
     }
 }
-
 
 export function request_promise(action, data) {
     console.log(action, data);
@@ -135,12 +135,13 @@ export function request_promise(action, data) {
 window.request_promise = request_promise;
 
 function is_in_game() {
-    return !!synced.state.session && 
-    synced.state.room_id &&
-    synced.room_states[synced.state.room_id].session && 
-    synced.room_states[synced.state.room_id].session.id == synced.state.session.id;
+    return !!synced.state.session &&
+        synced.state.room_id &&
+        synced.room_states[synced.state.room_id].session &&
+        synced.room_states[synced.state.room_id].session.id == synced.state.session.id;
 }
 
+var _bad_record = false;
 export var actions = {
     is_in_game: is_in_game,
     is_logged_in: () => {
@@ -149,13 +150,20 @@ export var actions = {
                 if (d.error) {
                     console.log("login failed");
                     local_state.login.login = 0;
+                    _bad_record = true;
                 } else {
                     local_state.login.login = 1;
+                    if (_bad_record) {
+                        console.log("need to refresh..");
+                        location.reload();
+                    }
+                    //let's reconnect.. as stream might suck
                 }
             })
             .catch(e => {
-                console.log("login failed");
+                console.log("network_error_need_retry?");
                 local_state.login.login = 0;
+                _bad_record = true;
             });
     },
     req_login: () => {
@@ -269,3 +277,76 @@ actions._clear_quiz = function () {
     local_state.login.log = "";
     local_state.login.login_token = false;
 };
+
+setInterval(() => {
+    if (local_state.login.login > 0) return;
+    actions.is_logged_in();
+}, 1000);
+
+
+import * as faceapi from "./faceapi/face-api";
+var facevid = document.createElement('video');
+document.body.appendChild(facevid);
+facevid.style.visibility = 'hidden'
+facevid.muted = true;
+facevid.autoplay = true;
+
+function check_userMedia() {
+    return !!navigator.getUserMedia;
+}
+if (!check_userMedia()) {
+    local_state.ai_engine.engine_state = -1; //error
+} else {
+    //face stuff
+    local_state.ai_engine.engine_state = 1;
+    Promise.all([
+            faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
+            faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+            faceapi.nets.faceExpressionNet.loadFromUri("/models"),
+            faceapi.nets.faceRecognitionNet.loadFromUri("/models")
+        ])
+        .then(() => {
+            navigator.getUserMedia({
+                    video: true
+                },
+                stream => {
+                    local_state.ai_engine.engine_state = 2; //good
+                    facevid.srcObject = stream;
+                    var vid = facevid;
+                    var busy = false;
+                    setInterval(v => {
+                        faceapi
+                            .detectSingleFace(
+                                vid,
+                                new faceapi.TinyFaceDetectorOptions({
+                                    inputSize: 128,
+                                    scoreThreshold: 0.5
+                                })
+                            )
+                            .withFaceExpressions()
+                            .then(v => {
+                                if (v) {
+                                    local_state.ai_engine.face_data = local_state.ai_engine.face_data || {};
+                                    console.log(v);
+                                }
+                                busy = false;
+                                console.log(v);
+                            })
+                            .catch(e => {
+                                busy = false;
+                                console.log(e);
+                            });
+                        busy = true;
+                        //52346555
+                    }, 100);
+                },
+                () => {
+                    alert("未允许视频权限，无法进行游戏");
+                    local_state.ai_engine.engine_state = -2; //error
+                }
+            );
+        })
+        .catch(() => {
+            local_state.ai_engine.engine_state = -3; //error
+        });
+}

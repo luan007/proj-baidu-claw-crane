@@ -1,5 +1,5 @@
 <template>
-  <div class='video_holder' ref="canvas_holder"></div>
+  <div class="video_holder" ref="canvas_holder"></div>
 </template>
 
 <script>
@@ -9,9 +9,9 @@ export default {
     this.vars = { player: null, prev_src: undefined };
   },
   watch: {
-      src: function() {
-          this.reload();
-      }
+    src: function() {
+      this.reload();
+    }
   },
   methods: {
     reload: function() {
@@ -19,13 +19,15 @@ export default {
         return;
       }
       this.destroy();
-      if(!this.src) return;
+      if (!this.src) return;
       this.vars.prev_src = this.src;
       this.vars.player = new JSMpeg.Player(this.src, {
+        audio: false,
         loop: true,
         autoplay: true
       });
       this.$refs.canvas_holder.appendChild(this.vars.player.renderer.canvas);
+      console.log("creating canvas");
     },
     destroy: function() {
       if (this.vars.player) {
@@ -35,26 +37,27 @@ export default {
     }
   },
   mounted: function() {
-      this.reload();
+    this.reload();
   },
   beforeDestroy: function() {
-      this.destroy();
+    console.log("DESTROYING STREAM");
+    this.destroy();
   }
 };
 </script>
 
 <style>
 .video_holder {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform-origin: 50% 50%;
-    transform: rotate(90deg) scale(0.8);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: 50% 50%;
+  transform: rotate(90deg) scale(0.8);
 }
 .video_holder canvas {
-    position: absolute;
-    left: 0;
-    transform: translate(-50%, -50%);
-    top: 0;
+  position: absolute;
+  left: 0;
+  transform: translate(-50%, -50%);
+  top: 0;
 }
 </style>
