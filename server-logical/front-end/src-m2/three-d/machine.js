@@ -14,7 +14,8 @@ export var group = new three.Group();
 loop(() => {
     group.position.y = ease(group.position.y, vueData.threeBg.sceneOffsetY, 0.1, 0.0001);
 });
-var machines = [];
+
+var machines = {};
 
 // shared.resources.model_claw.position.z = -5;
 // shared.resources.model_claw.rotation.x = 0.4;
@@ -26,7 +27,6 @@ var machines = [];
 
 export class tiny_machine {
     constructor() {
-        machines.push(this);
         this.group = new three.Group();
         group.add(this.group);
         this.build_struct();
@@ -70,10 +70,23 @@ export class tiny_machine {
         this.group_obj.position.y = bounce;
         this.group.rotation.y = (1 - this.visibility.value) * Math.PI * 3 + (Math.sin(this.t * 17) * Math.PI / 4);
         this.group.scale.set(v, v, v);
+        this.group.visible = this.visibility.value > 0.01;
     }
 }
 
+var inited = false;
 export function init() {
-    var tx = new tiny_machine();
-    window.tx = tx;
+    // var tx = new tiny_machine();
+    inited = true;
+    // window.tx = tx;
 }
+
+loop(() => {
+    if(!inited) return;
+    for(var i in vueData.synced.rooms) {
+        if(!machines[i]) {
+            machines[i] = new tiny_machine();
+        }
+        machines[i].visibility.to = vueData.picked_room == i ? 1 : 0;
+    }
+});

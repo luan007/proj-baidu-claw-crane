@@ -7,7 +7,8 @@ var machinedb = presist("machine", {
         id: 'test_machine',
         public: {
             cost: 2,
-            intro: "test_machine",
+            title: "测试娃娃机1号",
+            intro: "混合礼品，随意抓取",
             view_streams: ["ws://localhost:8082/"]
         },
         private: {
@@ -20,7 +21,8 @@ var machinedb = presist("machine", {
         id: 'test_machine2',
         public: {
             cost: 2,
-            intro: "test_machine2",
+            title: "测试娃娃机2号",
+            intro: "混合礼品，随意抓取",
             view_streams: ["ws://localhost:8082/"]
         },
         private: {
@@ -32,7 +34,8 @@ var machinedb = presist("machine", {
         id: 'test_machine3',
         public: {
             cost: 2,
-            intro: "test_machine3",
+            title: "测试娃娃机3号",
+            intro: "混合礼品，随意抓取",
             view_streams: ["ws://localhost:8082/"]
         },
         private: {

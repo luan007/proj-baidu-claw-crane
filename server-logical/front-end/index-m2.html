@@ -7,12 +7,13 @@
     <title>POC-M2</title>
     <style>
         #app {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             overflow: hidden;
+            background: #ffe8e8;
         }
 
         * {
@@ -93,7 +94,9 @@
 <body>
     <div id="app">
         <glcanvas></glcanvas>
-        <room_select></room_select>
+        <room_select v-bind:vueData="data"></room_select>
+        <avatar></avatar>
+        <login_dialog></login_dialog>
     </div>
     <script src="./src-m2/jsmpeg.js"></script>
     <script src="./src-m2/main.js"></script>

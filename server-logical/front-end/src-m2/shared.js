@@ -1,8 +1,11 @@
 import * as face from "./subsys-face";
 import * as remote from "./subsys-remote";
+import * as shared_actions from "./shared-actions";
 import {
     eased
 } from "./libao_stripped";
+
+export var actions = shared_actions.actions
 
 import * as three from "three"
 import {
@@ -16,11 +19,15 @@ export var resources = {
 export var vueData = {
     scene: "main",
     bgScene: "main",
+    picked_room: "",
     threeBg: {
+        bgScaleCoeff: 0.2,
         visibility: eased(0, 0, 0.02, 0.00001),
         trigger: 0,
         sceneOffsetY: 0
-    }
+    },
+    synced: shared_actions.synced,
+    local_state: shared_actions.local_state
 };
 
 window.vueData = vueData;

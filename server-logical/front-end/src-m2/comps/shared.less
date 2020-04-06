@@ -1,0 +1,86 @@
+@keyframes blink {
+    0% {
+        transform: translateY(0px);
+        box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
+    }
+
+    50% {
+        transform: translateY(-5px);
+        box-shadow: 0px 8px 0px rgba(0, 0, 0, 0.2);
+    }
+
+    100% {
+        transform: translateY(0px);
+        box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.error {
+    color: #df2d15 !important;
+}
+
+@keyframes swing {
+    0% {
+        transform: translateY(0px) rotate(0deg);
+    }
+
+    30% {
+        transform: translateY(-10px) rotate(5deg);;
+    }
+    60% {
+        transform: translateY(-10px) rotate(-5deg);;
+    }
+
+    100% {
+        transform: translateY(0px) rotate(0deg);;
+    }
+}
+
+.blinky {
+    animation: blink 3s infinite;
+}
+
+.big_cute_text {
+    position: absolute;
+    padding: 10px 20px;
+    /* border: 3px solid #07a5ee; */
+    border-radius: 10px;
+    font-weight: 900;
+    -webkit-text-stroke-width: 1px;
+    -moz-text-stroke-width: 1px;
+    -webkit-text-stroke-color: #fff;
+    background: #07a5ee;
+    box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
+    -moz-text-stroke-color: #fff;
+    color: #fff;
+    font-size: 1.2rem;
+    transform: translateY(-5px);
+    box-shadow: 0px 5px 0px rgba(0, 0, 0, 0.2);
+}
+
+
+
+.round-dialog-kindof-thing {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    /* bottom: -3px; */
+    top: 50%;
+    white-space: nowrap;
+    text-align: center;
+    /* border-radius: 20px; */
+    border-radius: 20px;
+    border: 3px solid rgb(0, 153, 255);
+    /* border: 2px solid #99eeff; */
+    background: linear-gradient(45deg,
+            rgb(0, 153, 255, 0.2) 7.5%,
+            rgba(0, 0, 0, 0) 7.5%,
+            rgba(0, 0, 0, 0) 42.5%,
+            rgb(0, 153, 255, 0.2) 42.5%,
+            rgb(0, 153, 255, 0.2) 57.5%,
+            rgba(0, 0, 0, 0) 57.5%,
+            rgba(0, 0, 0, 0) 92.5%,
+            rgb(0, 153, 255, 0.2) 92.5%);
+    background-size: 16px 16px;
+    animation: scrollbg 10s infinite both;
+}

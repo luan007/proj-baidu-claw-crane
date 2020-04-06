@@ -1,57 +1,57 @@
 <template>
-  <div class="room-selector">
+  <div v-bind:class="{'room-selector' : 1, 'show': vuedata.scene=='room'}">
     <div class="scroller">
-      <div v-for="n,key in [1,2,3,4,5,6,7,8]" class="room-card">
-        <div class="room-avatar"></div>
-        <div class="room-title">抓抓机 1号</div>
-        <div class="room-subtitle">抓抓好东西</div>
+      <div
+        v-on:click="pick_room(key)"
+        v-for="n,key in vuedata.synced.rooms"
+        v-bind:class="{'room-card': true, 'selected': key == vuedata.picked_room}"
+      >
+        <div class="room-avatar">
+          <div class="hidden_go">GO</div>
+        </div>
+        <div class="room-cost">{{room_machine(key).public.cost}}</div>
+        <div class="room-title">{{room_machine(key).public.title}}</div>
+        <div class="room-subtitle">{{room_machine(key).public.intro}}</div>
+        <div v-if="true" class="room-states">
+          <div class="tag">
+            <span style="padding-right: 2px; ">{{get_room_state(key).emoji}}</span>
+            {{get_room_state(key).message}}
+          </div>
+          <div class="tag">
+            <span style="padding-right: 2px; ">📶</span>
+            在线 {{vuedata.synced.room_states[key].users}}
+          </div>
+        </div>
+        <div v-else class="room-states">
+          <div class="tag">
+            <span style="padding-right: 2px; ">⭕️</span>虚拟娃娃机
+          </div>
+        </div>
       </div>
     </div>
     <div class="room-select-title big_cute_text">
       选择娃娃机
-      <div style="font-size:0.8em">MACHINE SELECT</div>
+      <div style="font-size:0.8em">CHOOSE MACHINE</div>
     </div>
   </div>
 </template>
 
 <script>
-export default {};
+import "./shared.less";
+import * as shared from "../shared";
+export default {
+  props: ["vuedata"],
+  methods: shared.actions
+};
 </script>
 
 <style>
-@keyframes blink {
-  0% {
-    transform: translateY(0px);
-    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
-  }
-  50% {
-    transform: translateY(-5px);
-    box-shadow: 0px 8px 0px rgba(0, 0, 0, 0.2);
-  }
-  100% {
-    transform: translateY(0px);
-    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
-  }
+.room-selector {
+  transition: all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+  transform: translateY(120%);
 }
-.blinky {
-  animation: blink 3s infinite;
-}
-.big_cute_text {
-  position: absolute;
-  padding: 10px 20px;
-  /* border: 3px solid #07a5ee; */
-  border-radius: 10px;
-  font-weight: 900;
-  -webkit-text-stroke-width: 1px;
-  -moz-text-stroke-width: 1px;
-  -webkit-text-stroke-color: #fff;
-  background: #07a5ee;
-  box-shadow: 5px 5px 0px rgba(0, 0, 0, 0.2);
-  -moz-text-stroke-color: #fff;
-  color: #fff;
-  font-size: 1.2rem;
-  transform: translateY(-5px);
-  box-shadow: 0px 5px 0px rgba(0, 0, 0, 0.2);
+.room-selector.show {
+  transform: translateY(0%);
 }
 .room-select-title {
   position: absolute;
@@ -61,13 +61,13 @@ export default {};
   left: 1.2rem;
 }
 .scroller {
-  scroll-behavior: smooth;
   overflow: scroll;
   -webkit-overflow-scrolling: touch;
   position: absolute;
   top: 0px;
   left: 10px;
   right: 10px;
+  pointer-events: all;
   bottom: 0px;
   padding-top: 40px;
 }
@@ -129,8 +129,7 @@ export default {};
   }
 }
 
-.room-card.selected,
-.room-card:hover {
+.room-card.selected {
   color: #fff;
   animation: none;
   background-color: #07a5ee;
@@ -152,18 +151,49 @@ export default {};
   margin-left: 30px;
   color: #07a5ee;
   transition: all 0.2s ease;
-  animation: blink 2s infinite;
+  box-shadow: 5px 5px 0px rgba(0,0,0,0.2);
+  /* animation: blink 2s infinite; */
 }
+
+.room-card.selected {
+  box-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+}
+
 .room-subtitle {
+  color: #333;
   text-align: left;
   font-style: italic;
-  font-size: 1rem;
+  font-size: 0.8rem;
+  margin-top: 0.8rem;
+  margin-bottom: 0.8rem;
   font-weight: lighter;
+}
+.room-states {
+  margin-top: 0.5rem;
+  text-align: left;
+  font-size: 0.8rem;
+  font-weight: bolder;
+}
+.room-states .tag {
+  text-align: right;
+  font-size: 0.8rem;
+  font-weight: bolder;
+  display: inline-block;
+  background: #07a5ee;
+  color: #fff;
+  /* color: #ffffff; */
+  vertical-align: middle;
+  padding: 5px 5px;
+  line-height: 0.8rem;
 }
 .room-title {
   margin-bottom: 0.5rem;
   text-align: left;
-  font-size: 2rem;
+  color: #000;
+  font-size: 1.5rem;
+}
+.selected .room-title, .selected .room-subtitle{
+  color: #fff;
 }
 .room-avatar {
   transition: all 0.2s ease;
@@ -175,9 +205,27 @@ export default {};
   left: 1rem;
   top: 1rem;
 }
-.room-card.selected .room-avatar,
-.room-card:hover .room-avatar {
+.room-cost {
+  transition: all 0.2s ease;
+  position: absolute;
+  width: 4rem;
+  background: #07a5ee;
+  border-radius: 5px;
+  left: 1rem;
+  top: 5.5rem;
+  color: white;
+  font-size: 1rem;
+  font-weight: bolder;
+}
+.room-card.selected .room-avatar {
   background: rgba(255, 255, 255, 1);
-  transform: scale(1.2);
+  /* transform: scale(1.2); */
+}
+.room-avatar .hidden_go {
+  color: #07a5ee;
+  top: 50%;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
