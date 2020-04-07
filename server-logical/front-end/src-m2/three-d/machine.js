@@ -45,7 +45,9 @@ export class tiny_machine {
         grp.scale.set(0.3, 0.3, 0.3);
         var platform = new three.CircleGeometry(1, 50);
         var m = new three.MeshBasicMaterial({
-            color: 0xcccccc
+            color: 0x0,
+            transparent: true,
+            opacity: 0.5,
         });
         var mesh = new three.Mesh(platform, m);
         this.platform = mesh;
@@ -53,7 +55,7 @@ export class tiny_machine {
         this.group.add(mesh);
         this.group.add(grp);
         this.group.position.z = -5;
-        this.group.position.y = -0.5;
+        this.group.position.y = -0.8;
         this.group.rotation.x = 0.2;
         this.group.rotation.y = 0.6;
         loop(() => {
@@ -64,10 +66,12 @@ export class tiny_machine {
         var v = this.visibility.value + 0.01;
         var bounce = 1 - Math.pow(2 * (this.visibility.value - 0.5), 2);
         this.t += 0.001;
-        this.group_obj.scale.y = Math.sin(this.t * 50) * 0.01 + 0.3;
-        this.group_obj.scale.x = Math.cos(this.t * 50) * 0.005 + 0.3;
-        this.group_obj.scale.z = Math.cos(this.t * 50) * 0.005 + 0.3;
+        this.group_obj.scale.y = Math.sin(this.t * 50) * 0.01 + 0.4;
+        this.group_obj.scale.x = Math.cos(this.t * 50) * 0.005 + 0.4;
+        this.group_obj.scale.z = Math.cos(this.t * 50) * 0.005 + 0.4;
         this.group_obj.position.y = bounce;
+        this.platform.position.y = -bounce;
+        this.platform.scale.set(1 - bounce, 1 - bounce, 1 - bounce);
         this.group.rotation.y = (1 - this.visibility.value) * Math.PI * 3 + (Math.sin(this.t * 17) * Math.PI / 4);
         this.group.scale.set(v, v, v);
         this.group.visible = this.visibility.value > 0.01;
@@ -82,9 +86,9 @@ export function init() {
 }
 
 loop(() => {
-    if(!inited) return;
-    for(var i in vueData.synced.rooms) {
-        if(!machines[i]) {
+    if (!inited) return;
+    for (var i in vueData.synced.rooms) {
+        if (!machines[i]) {
             machines[i] = new tiny_machine();
         }
         machines[i].visibility.to = vueData.picked_room == i ? 1 : 0;

@@ -1,11 +1,23 @@
 <template>
-  <div class="user-avatar">
-    <div class="head">
-      <div class="user-name">
-        测试用户001
+  <div>
+    <div class="user-avatar">
+      <div class="head">
+        <div class="user-name">测试用户001</div>
+        <div class="user-stat" v-if="vuedata.local_state.channel.connected > 0">
+          <i class="fas fa-gamepad"></i>
+          {{Object.keys(vuedata.synced.user.sessions).length}}
+        </div>
+        <div v-else class="user-stat" style="background: red">
+          <i class="fas fa-satellite-dish"></i>
+          正在连接..
+        </div>
       </div>
-      <div class="user-stat">
-        <i class="fas fa-gamepad"></i> {{vuedata.synced.user.private.coin}}
+    </div>
+
+    <div class="coins">
+      <div class="tag-stat">
+        <i class="fas fa-coins" v-on:click="show_dialog('coin')" style="padding-right:0.3rem"></i>
+        {{vuedata.synced.user.private.coin}}
       </div>
     </div>
   </div>
@@ -19,11 +31,18 @@ export default {
     return {
       vuedata: shared.vueData
     };
-  }
+  },
+  methods: shared.actions
 };
 </script>
 
 <style scoped>
+.coins {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  text-align: right;
+}
 .user-name {
   font-size: 0.8rem;
   font-weight: bolder;
@@ -31,12 +50,13 @@ export default {
   top: 100%;
   transform: translateY(10px);
 }
+.tag-stat,
 .user-stat {
   font-size: 0.8rem;
   font-weight: bolder;
   padding: 0.2rem 0.5rem;
   color: white;
-  background: #ff5a00;
+  background: #73ce67;
   position: absolute;
   bottom: -0.5rem;
   border: 3px solid white;
@@ -44,18 +64,14 @@ export default {
   white-space: nowrap;
   border-radius: 9999px;
 }
-.coins {
-  font-size: 0.8rem;
-  font-weight: bolder;
-  padding: 0.2rem 0.5rem;
-  color: white;
-  background: #ff5a00;
-  position: absolute;
-  bottom: -0.5rem;
-  border: 3px solid white;
-  left: 50%;
-  white-space: nowrap;
-  border-radius: 9999px;
+.tag-stat {
+  bottom: 0;
+  left: 0;
+  font-size: 1.0rem;
+  padding: 0.4rem 0.8rem;
+  background: #ff9d00;
+  position: relative;
+  display: inline-block;
 }
 .user-avatar {
   position: fixed;

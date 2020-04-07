@@ -1,43 +1,19 @@
 <template>
   <div class="fs">
-    <div class="fs" v-if="local_state.login.login <= 0">
+    <div v-bind:class="{fs:true, show: local_state.dialog == 'coin'}">
       <div class="mask"></div>
-      <div class="round-dialog-kindof-thing login">
+      <div class="round-dialog-kindof-thing dialog bgw">
         <div class="title">
-          登录
+          获取更多金币
           <br />
-          <span style="font-size: 0.8em">LOGIN</span>
+          <span style="font-size: 0.8em">ADD COINS</span>
         </div>
-        <div
-          v-if="!local_state.login.login_token"
-          class="login-forms"
-          style="position: relative; margin-top: 1rem;"
-        >
-          <div class="minor">请输入手机号码</div>
-          <input v-model="local_state.login.phone_number" placeholder="+861.." />
-          <div class="minor error">{{local_state.login.log}}</div>
-          <div class="btn" v-on:click="req_login">发送验证码</div>
-        </div>
-        <div v-else class="login-forms" style="position: relative; margin-top: 1rem;">
-          <div class="minor">请输入验证码</div>
-          <input v-model="local_state.login.anwser" placeholder="****" />
-          <div class="minor error">{{local_state.login.log}}</div>
-          <div class="btn" v-on:click="clear_quiz">返回</div>
-          <div class="btn confirm" v-on:click="req_quiz">验证</div>
+        <div class="forms" style="position: relative; ">
+          <div class="minor">点击按钮充值获取金币</div>
+          <div class="btn" v-on:click="add_coin(20)">测试支付完成</div>
+          <div class="btn" v-on:click="close_dialog('coin')">关闭</div>
         </div>
       </div>
-    </div>
-    <div class="fs" style="pointer-events: all" v-if="local_state.loading">
-      <!-- loading or so -->
-      <div class="mask"></div>
-      <div class="round-dialog-kindof-thing" style="width: 80%">
-        <div class="expand">
-        <div>
-          <div class="title">Loading</div>
-        </div>
-        </div>
-      </div>
-      <!-- login -->
     </div>
   </div>
 </template>
@@ -54,11 +30,9 @@ export default {
 </script>
 
 <style scoped>
-.login {
-  text-align: left;
-}
-.login-forms {
+.forms {
   padding-bottom: 1rem;
+  padding: 1.5rem;
 }
 input::placeholder {
   font-style: italic;
@@ -81,17 +55,19 @@ input {
   margin-left: 1rem;
   margin-right: 1rem;
 }
-.login {
-  pointer-events: all;
+.dialog {
   border: none;
   box-shadow: 0px 5px 0px rgba(0, 0, 0, 0.1);
 }
 .minor {
   font-size: 1.2rem;
   color: #666;
-  margin-top: 1rem;
   margin-bottom: 1rem;
   font-weight: bolder;
+}
+.btn:hover {
+  background: #07a5ee;
+  color: white;
 }
 .btn {
   border: 3px solid #07a5ee;
@@ -104,7 +80,7 @@ input {
 }
 .title {
   position: absolute;
-  top: -7rem;
+  top: -5.5rem;
   left: 0;
   right: 0;
   padding: 10px 20px;
@@ -118,11 +94,11 @@ input {
   -webkit-text-stroke-color: rgb(255, 255, 255);
   -moz-text-stroke-color: rgb(255, 255, 255);
   color: rgb(255, 255, 255);
-  font-size: 2.2rem;
+  font-size: 1.5rem;
   transform-origin: 50% 50%;
   animation: swing 3s ease infinite;
 }
-.login {
+.bgw {
   background: white;
 }
 .fs {
@@ -150,5 +126,30 @@ input {
   background: #07a5ee;
   color: white;
   font-weight: bolder;
+}
+
+.fs {
+  pointer-events: none;
+}
+
+.fs .mask {
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.fs .dialog {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0) rotate(30deg);
+  transform-origin: 50% 50%;
+  transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.fs.show .mask {
+  opacity: 1;
+}
+.fs.show .dialog {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: all;
+  transform-origin: 50% 50%;
 }
 </style>

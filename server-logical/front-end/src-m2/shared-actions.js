@@ -14,6 +14,7 @@ export var synced = {
 };
 
 export var local_state = {
+    dialog: "",
     ai_engine: {
         face_data: {},
         engine_state: 0
@@ -31,6 +32,7 @@ export var local_state = {
         anwser: "",
         log: ""
     },
+    loading: false,
     synced: synced
 };
 
@@ -162,8 +164,8 @@ export var actions = {
             })
             .catch(e => {
                 console.log("network_error_need_retry?");
-                local_state.login.login = 0;
-                _bad_record = true;
+                local_state.login.login = 1;
+                _bad_record = false;
             });
     },
     clear_quiz: function () {
@@ -235,6 +237,20 @@ export var actions = {
     send_chat: (pack) => {
         main_socket.emit("chat", pack);
     },
+    set_loading() {
+        local_state.loading = 1;
+    },
+    clear_loading() {
+        local_state.loading = 0;
+    },
+    show_dialog(x) {
+        local_state.dialog = x;
+    },
+    close_dialog(x) {
+        if((x && local_state.dialog == x) || !x) {
+            local_state.dialog = null;
+        } 
+    },
     send_cmd: (pack) => {
         //ready?
         if (is_in_game()) {
@@ -242,8 +258,8 @@ export var actions = {
             main_socket.emit("control", pack);
         }
     },
-    pick_room (room_id) {
-        if(room_id == vueData.picked_room) {
+    pick_room(room_id) {
+        if (room_id == vueData.picked_room) {
             actions.join_room(room_id);
         }
         vueData.picked_room = room_id;
@@ -290,6 +306,14 @@ export var actions = {
     }
 };
 
+loop(()=>{
+    //ensure login dialog goes first
+    if(local_state.login.login > 0) {
+        actions.close_dialog("login");
+    } else if(local_state.login.login <= 0) {
+        actions.show_dialog("login");
+    }
+})
 
 setInterval(() => {
     if (local_state.login.login > 0) return;
@@ -298,7 +322,10 @@ setInterval(() => {
 
 
 import * as faceapi from "./faceapi/face-api";
-import { vueData } from "./shared";
+import {
+    vueData
+} from "./shared";
+import { loop } from "./libao_stripped";
 var facevid = document.createElement('video');
 document.body.appendChild(facevid);
 facevid.style.visibility = 'hidden'
@@ -313,6 +340,7 @@ if (!check_userMedia()) {
 } else {
     //face stuff
     local_state.ai_engine.engine_state = 1;
+    local_state.loading = 1;
     Promise.all([
             faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
             faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
@@ -320,6 +348,7 @@ if (!check_userMedia()) {
             faceapi.nets.faceRecognitionNet.loadFromUri("/models")
         ])
         .then(() => {
+            var first = true;
             navigator.getUserMedia({
                     video: true
                 },
@@ -339,14 +368,21 @@ if (!check_userMedia()) {
                             )
                             .withFaceExpressions()
                             .then(v => {
+                                if(first) {
+                                    local_state.loading = 0;
+                                }
+                                first = false;
                                 if (v) {
                                     local_state.ai_engine.face_data = local_state.ai_engine.face_data || {};
                                     // console.log(v);
                                 }
                                 busy = false;
-                                // console.log(v);
                             })
                             .catch(e => {
+                                if(first) {
+                                    local_state.loading = 0;
+                                }
+                                first = false;
                                 busy = false;
                                 // console.log(e);
                             });
@@ -355,6 +391,7 @@ if (!check_userMedia()) {
                     }, 200);
                 },
                 () => {
+                    local_state.loading = 0;
                     alert("未允许视频权限，无法进行游戏");
                     local_state.ai_engine.engine_state = -2; //error
                 }

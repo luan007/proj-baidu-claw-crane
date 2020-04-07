@@ -40,8 +40,6 @@ export function fully_loaded() {
     });
 }
 
-
-
 var scene_main = ao.sceneBuild(
     () => {}, "main", "main"
 )
