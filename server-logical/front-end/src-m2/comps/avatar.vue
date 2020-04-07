@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="user-avatar">
-      <div class="head">
+      <div class="head" v-on:click="show_dialog('user')">
         <div class="user-name">测试用户001</div>
         <div class="user-stat" v-if="vuedata.local_state.channel.connected > 0">
           <i class="fas fa-gamepad"></i>

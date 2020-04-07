@@ -1,7 +1,7 @@
 <template>
   <div class="fs">
     <div v-bind:class="{fs:true, show: local_state.dialog == 'coin'}">
-      <div class="mask"></div>
+      <div class="mask" v-on:click="close_dialog('coin')"></div>
       <div class="round-dialog-kindof-thing dialog bgw">
         <div class="title">
           获取更多金币
@@ -10,8 +10,33 @@
         </div>
         <div class="forms" style="position: relative; ">
           <div class="minor">点击按钮充值获取金币</div>
-          <div class="btn" v-on:click="add_coin(20)">测试支付完成</div>
+          <div class="btn" v-on:click="add_coin(10)">测试+10</div>
           <div class="btn" v-on:click="close_dialog('coin')">关闭</div>
+          <div class="minor" style="margin-top: 1rem; font-size: 0.6em; font-weight: 300;">
+            <i>
+              点击测试后系统模拟支付过程
+              <br />约10秒后“充值到账”
+            </i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-bind:class="{fs:true, show: local_state.dialog == 'user'}">
+      <div class="mask" v-on:click="close_dialog('coin')"></div>
+      <div class="round-dialog-kindof-thing dialog bgw">
+        <div class="title">
+          玩家
+          <br />
+          <span style="font-size: 0.8em">PLAYER</span>
+        </div>
+        <div class="forms" style="position: relative; ">
+          <div class="btn" v-on:click="close_dialog('user')">关闭</div>
+          <div class="minor" style="margin-top: 1rem; font-size: 0.6em; font-weight: 300;">
+            <i>
+              用户配置将在这里
+            </i>
+          </div>
         </div>
       </div>
     </div>
@@ -145,6 +170,7 @@ input {
 
 .fs.show .mask {
   opacity: 1;
+  pointer-events: all;
 }
 .fs.show .dialog {
   opacity: 1;

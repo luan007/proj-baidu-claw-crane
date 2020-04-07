@@ -336,7 +336,7 @@ app.post("/actions/change_room/:room_id", (req, res) => {
 
 app.post("/actions/add_coin", (req, res) => {
     setTimeout(() => {
-        req.user.private.coin+=10;
+        req.user.private.coin += req.body ? (req.body.amount || 10) : 10;
     }, 5000)
     return res.json({
         result: "OK"

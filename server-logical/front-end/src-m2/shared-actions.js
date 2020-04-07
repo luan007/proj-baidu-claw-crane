@@ -225,8 +225,10 @@ export var actions = {
             local_state.generic_error = e.toString();
         });
     },
-    add_coin: () => {
-        request_promise("add_coin").then(v => {
+    add_coin: (amt) => {
+        request_promise("add_coin", {
+            amount: amt
+        }).then(v => {
             if (v.error) {
                 local_state.generic_error = v.error
             }
@@ -247,9 +249,9 @@ export var actions = {
         local_state.dialog = x;
     },
     close_dialog(x) {
-        if((x && local_state.dialog == x) || !x) {
+        if ((x && local_state.dialog == x) || !x) {
             local_state.dialog = null;
-        } 
+        }
     },
     send_cmd: (pack) => {
         //ready?
@@ -306,11 +308,11 @@ export var actions = {
     }
 };
 
-loop(()=>{
+loop(() => {
     //ensure login dialog goes first
-    if(local_state.login.login > 0) {
+    if (local_state.login.login > 0) {
         actions.close_dialog("login");
-    } else if(local_state.login.login <= 0) {
+    } else if (local_state.login.login <= 0) {
         actions.show_dialog("login");
     }
 })
@@ -325,7 +327,9 @@ import * as faceapi from "./faceapi/face-api";
 import {
     vueData
 } from "./shared";
-import { loop } from "./libao_stripped";
+import {
+    loop
+} from "./libao_stripped";
 var facevid = document.createElement('video');
 document.body.appendChild(facevid);
 facevid.style.visibility = 'hidden'
@@ -368,7 +372,7 @@ if (!check_userMedia()) {
                             )
                             .withFaceExpressions()
                             .then(v => {
-                                if(first) {
+                                if (first) {
                                     local_state.loading = 0;
                                 }
                                 first = false;
@@ -379,7 +383,7 @@ if (!check_userMedia()) {
                                 busy = false;
                             })
                             .catch(e => {
-                                if(first) {
+                                if (first) {
                                     local_state.loading = 0;
                                 }
                                 first = false;
@@ -390,9 +394,10 @@ if (!check_userMedia()) {
                         //52346555
                     }, 200);
                 },
-                () => {
+                (e) => {
                     local_state.loading = 0;
                     alert("未允许视频权限，无法进行游戏");
+                    alert(e);
                     local_state.ai_engine.engine_state = -2; //error
                 }
             );
