@@ -34,6 +34,7 @@ export function fully_loaded() {
     three_components.comp_machine.init();
     three_scene.add(three_components.comp_background.group)
     three_scene.add(three_components.comp_machine.group);
+    three_scene.add(three_components.comp_foreground.group);
     ao.vueLoadComponents(q)
     ao.vueSetup("#app", {
         data: shared.vueData
@@ -58,11 +59,13 @@ loop(() => {
     vueData.threeBg.sceneOffsetY = shared.vueData.scene == 'room' ? 1 : 0;
     if (shared.vueData.local_state.login.login) {
         shared.vueData.scene = "room";
-        // if (window["tx"]) {
-        //     tx.visibility.to = 1
-        // }
     }
     else {
         shared.vueData.scene = "login";
     }
+    //check if in room
+    if(shared.actions.current_room_id()) {
+        shared.vueData.scene = "game"
+    }
+    three_components.comp_foreground.xpand.to = shared.vueData.scene == 'game' ? 1 : 0;
 })

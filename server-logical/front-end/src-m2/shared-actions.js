@@ -136,16 +136,15 @@ export function request_promise(action, data) {
 
 window.request_promise = request_promise;
 
-function is_in_game() {
-    return !!synced.state.session &&
-        synced.state.room_id &&
-        synced.room_states[synced.state.room_id].session &&
-        synced.room_states[synced.state.room_id].session.id == synced.state.session.id;
-}
 
 var _bad_record = false;
 export var actions = {
-    is_in_game: is_in_game,
+    is_in_game() {
+        return !!synced.state.session &&
+            synced.state.room_id &&
+            synced.room_states[synced.state.room_id].session &&
+            synced.room_states[synced.state.room_id].session.id == synced.state.session.id;
+    },
     is_logged_in: () => {
         request_promise("is_logged_in", {})
             .then(d => {
@@ -167,6 +166,9 @@ export var actions = {
                 local_state.login.login = 1;
                 _bad_record = false;
             });
+    },
+    cur_is_logged_in: () => {
+        return local_state.login.login > 0;
     },
     clear_quiz: function () {
         local_state.login.log = "";
@@ -305,6 +307,13 @@ export var actions = {
     },
     room_machine(room_id) {
         return synced.machines[synced.rooms[room_id].machine];
+    },
+    current_room_id() {
+        try {
+            return synced.state.room_id;
+        } catch (e) {
+            console.log(e);
+        }
     }
 };
 

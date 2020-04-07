@@ -54,7 +54,7 @@ export class tiny_machine {
         mesh.rotation.x = -0.5 * Math.PI
         this.group.add(mesh);
         this.group.add(grp);
-        this.group.position.z = -5;
+        this.group.position.z = -10;
         this.group.position.y = -0.8;
         this.group.rotation.x = 0.2;
         this.group.rotation.y = 0.6;

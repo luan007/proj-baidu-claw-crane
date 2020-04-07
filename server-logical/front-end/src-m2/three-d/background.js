@@ -10,6 +10,8 @@ import {
     vueData
 } from "../shared";
 
+export var group = new three.Group();
+
 
 var SIZE_X = 13;
 var SIZE_Y = 13;
@@ -23,8 +25,6 @@ var buffer_canvas = document.createElement("canvas");
 buffer_canvas.width = CANVAS_W;
 buffer_canvas.height = CANVAS_H;
 var buffer_ctx2d = buffer_canvas.getContext('2d');
-
-export var group = new three.Group();
 
 var dirlight = new three.DirectionalLight(0xffffff, 0.5);
 dirlight.position.set(5, 5, 5);
@@ -140,11 +140,13 @@ loop(() => {
         v.scaler = ease(v.scaler, nscaler, 0.1, 0.0001);
         v.scale.set(v.scaler * 1.5, v.scaler * 1.5, v.scaler * 1.5);
         v.position.y = v.position._y + v.scaler * 0.4;
-        v.position.z = -10 + 2 * v.scaler;
+        v.position.z = -20 + 2 * v.scaler;
         v.rotation.set(0, v.scaler * Math.PI * 2, v.scaler * Math.PI * 2);
         v.visible = v.scaler > 0.05;
     });
 });
+
+
 
 
 // document.body.addEventListener("touchstart", ()=>{

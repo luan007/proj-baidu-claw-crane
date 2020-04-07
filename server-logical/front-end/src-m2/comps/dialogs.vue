@@ -23,18 +23,40 @@
     </div>
 
     <div v-bind:class="{fs:true, show: local_state.dialog == 'user'}">
-      <div class="mask" v-on:click="close_dialog('coin')"></div>
+      <div class="mask" v-on:click="close_dialog('user')"></div>
       <div class="round-dialog-kindof-thing dialog bgw">
         <div class="title">
-          玩家
+          玩家信息
           <br />
-          <span style="font-size: 0.8em">PLAYER</span>
+          <span style="font-size: 0.8em">PLAYER SETTINGS</span>
         </div>
         <div class="forms" style="position: relative; ">
           <div class="btn" v-on:click="close_dialog('user')">关闭</div>
+          <div class="btn" v-on:click="join_room('0')">返回Lobby</div>
           <div class="minor" style="margin-top: 1rem; font-size: 0.6em; font-weight: 300;">
             <i>
               用户配置将在这里
+            </i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <div v-bind:class="{fs:true, show: local_state.dialog == 'help'}">
+      <div class="mask" v-on:click="close_dialog('help')"></div>
+      <div class="round-dialog-kindof-thing dialog bgw">
+        <div class="title">
+          玩法教学
+          <br />
+          <span style="font-size: 0.8em">TUTORIAL</span>
+        </div>
+        <div class="forms" style="position: relative; ">
+          <div class="btn" v-on:click="close_dialog('help')">关闭</div>
+          <div class="minor" style="margin-top: 1rem; font-size: 0.6em; font-weight: 300;">
+            <i>
+              玩法教学Placeholder
             </i>
           </div>
         </div>

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="vuedata.synced.user.private">
     <div class="user-avatar">
       <div class="head" v-on:click="show_dialog('user')">
         <div class="user-name">测试用户001</div>
@@ -19,12 +19,16 @@
         <i class="fas fa-coins" v-on:click="show_dialog('coin')" style="padding-right:0.3rem"></i>
         {{vuedata.synced.user.private.coin}}
       </div>
+
+      <div class="round-stat">
+        <i class="fas fa-question" v-on:click="show_dialog('help')"></i>
+      </div>
     </div>
+
   </div>
 </template>
 
 <script>
-import "../fonts/fontawesome-free-5.13.0-web/css/all.css";
 import * as shared from "../shared";
 export default {
   data: function() {
@@ -67,7 +71,7 @@ export default {
 .tag-stat {
   bottom: 0;
   left: 0;
-  font-size: 1.0rem;
+  font-size: 1rem;
   padding: 0.4rem 0.8rem;
   background: #ff9d00;
   position: relative;
@@ -85,5 +89,21 @@ export default {
   border: 3px solid #ffffff;
   background: #ccc;
   border-radius: 999999px;
+}
+
+.round-stat {
+    display: inline-block;
+    bottom: 0;
+    left: 0;
+    font-size: 1rem;
+    width: 1.8rem;
+    line-height: 1.8rem;
+    height: 1.8rem;
+    /* padding: 0.4rem 0.8rem; */
+    background: #90c1ff;
+    position: relative;
+    border: 3px solid white;
+    color: white;
+    border-radius: 9999rem;
 }
 </style>
