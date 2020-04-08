@@ -20,7 +20,7 @@ machines.events.on("states", (changes) => {
                     started: Date.now(),
                     ended: 0,
                     machine: i,
-                    countdown: 60,
+                    countdown: 5,
                     gameresult: -5,
                     state: 0, //began & so on
                     user: machines.states[i].user_on_request.user,
@@ -30,20 +30,26 @@ machines.events.on("states", (changes) => {
                     user_on_request: false,
                     session: sess
                 });
-                setTimeout(() => {
+
+                var countdown = setInterval(() => {
+                    sess.countdown--;
                     sess = JSON.parse(JSON.stringify(sess));
-                    sess.ended = Date.now();
+                    if (sess.countdown < 0) {
+                        sess.countdown = 0;
+                        sess.ended = Date.now();
+                        clearInterval(countdown);
+                        setTimeout(() => {
+                            machines.report_from_machine(i, {
+                                session: false
+                            });
+                        }, 1000);
+                    }
                     machines.report_from_machine(i, {
                         user_on_request: false,
                         session: sess
                     });
-                }, 5000);
+                }, 1000);
 
-                setTimeout(() => {
-                    machines.report_from_machine(i, {
-                        session: false
-                    });
-                }, 5500);
             })(i);
         }
     }

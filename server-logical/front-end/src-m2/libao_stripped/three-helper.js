@@ -319,6 +319,7 @@ export function threeRenderer(options) {
 
 export function threeLoop(options) {
     loop(() => {
+        if (window.pause_three) return;
         threeTick(options);
     });
 }

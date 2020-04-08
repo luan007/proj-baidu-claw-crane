@@ -1,5 +1,5 @@
 <template>
-  <div v-if="vuedata.synced.user.private">
+  <div style="position:absolute; z-index: 100" v-if="vuedata.synced.user.private">
     <div class="user-avatar">
       <div class="head" v-on:click="show_dialog('user')">
         <div class="user-name">测试用户001</div>
@@ -43,16 +43,21 @@ export default {
 <style scoped>
 .coins {
   position: fixed;
-  top: 20px;
-  right: 20px;
+  top: 10px;
+  right: 10px;
   text-align: right;
 }
 .user-name {
-  font-size: 0.8rem;
-  font-weight: bolder;
-  position: absolute;
-  top: 100%;
-  transform: translateY(10px);
+font-size: 0.8rem;
+    font-weight: bolder;
+    position: absolute;
+    top: -0.3rem;
+    text-align: left;
+    transform: translateY(10px);
+    left: 100%;
+    padding-left: 0.5rem;
+    /* white-space: nowrap; */
+    width: 5rem;
 }
 .tag-stat,
 .user-stat {
@@ -62,9 +67,9 @@ export default {
   color: white;
   background: #73ce67;
   position: absolute;
-  bottom: -0.5rem;
+  bottom: 0rem;
   border: 3px solid white;
-  left: 50%;
+  left: 100%;
   white-space: nowrap;
   border-radius: 9999px;
 }
@@ -79,13 +84,13 @@ export default {
 }
 .user-avatar {
   position: fixed;
-  left: 20px;
-  top: 20px;
+  left: 10px;
+  top: 10px;
 }
 
 .head {
-  height: 70px;
-  width: 70px;
+  height: 50px;
+  width: 50px;
   border: 3px solid #ffffff;
   background: #ccc;
   border-radius: 999999px;

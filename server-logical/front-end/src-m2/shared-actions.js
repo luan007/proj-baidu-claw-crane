@@ -1,8 +1,5 @@
 import io from "socket.io-client";
 export var main_socket = io(":9797")
-console.log(
-    "hitting loading"
-)
 
 export var synced = {
     machines: {},
@@ -13,12 +10,30 @@ export var synced = {
     state: {}
 };
 
+export var ai_engine = {
+    face_data: false,
+    face_data_persist: false,
+    engine_state: 0,
+    face_sp: {
+        mouth: 0,
+        tiltLeft: 0,
+        tiltRight: 0,
+        tiltDown: 0,
+        tiltUp: 0,
+        turnLeft: 0,
+        turnRight: 0
+    },
+    face_pos: {
+        x: 0,
+        y: 0
+    },
+    face_expr: {},
+    main_expr: null
+};
+
 export var local_state = {
     dialog: "",
-    ai_engine: {
-        face_data: {},
-        engine_state: 0
-    },
+    ai_engine: ai_engine,
     generic_error: "",
     channel: {
         connected: false,
@@ -257,7 +272,7 @@ export var actions = {
     },
     send_cmd: (pack) => {
         //ready?
-        if (is_in_game()) {
+        if (actions.is_in_game()) {
             console.log("streaming control", pack);
             main_socket.emit("control", pack);
         }
@@ -314,6 +329,25 @@ export var actions = {
         } catch (e) {
             console.log(e);
         }
+    },
+    current_room_state() {
+        try {
+            return synced.room_states[synced.state.room_id];
+        } catch (e) {
+        }
+    },
+    current_room_session() {
+        try {
+            return actions.current_room_state().session;
+        } catch (e) {
+        }
+    },
+    current_machine_id() {
+        try {
+            return actions.room_machine(synced.state.room_id).id;
+        } catch (e) {
+            console.log(e);
+        }
     }
 };
 
@@ -339,26 +373,100 @@ import {
 import {
     loop
 } from "./libao_stripped";
-var facevid = document.createElement('video');
+export var facevid = document.createElement('video');
 document.body.appendChild(facevid);
 facevid.style.visibility = 'hidden'
 facevid.muted = true;
 facevid.autoplay = true;
 
+function _dist(a, b) {
+    return Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2))
+}
+
+function compute_face(face) {
+    if (!face) {
+        return;
+    }
+    ai_engine.face_expr = face.expressions;
+    var box = face.alignedRect.relativeBox;
+    var _x = (box.x + box.width / 2)
+    var _y = box.y + box.height / 2;
+    ai_engine.face_pos.x = _x;
+    ai_engine.face_pos.y = _y;
+    // console.log(_x, _y);
+
+
+
+    var max = 0.4;
+    var max_k = null;
+    for (var i in ai_engine.face_expr) {
+        if (i == 'angry') {
+            ai_engine.face_expr[i] *= 10;
+        }
+        if (i == 'sad') {
+            ai_engine.face_expr[i] *= 4;
+        }
+        if (ai_engine.face_expr[i] > max) {
+            max = ai_engine.face_expr[i];
+            max_k = i;
+        }
+    }
+    // var leye = face.landmarks.getMouth();
+    ai_engine.main_expr = max_k;
+    // var dists = [];
+    // for (var d = 0; d < leye.length; d++) {
+
+    // dists.push(Math.sqrt(Math.abs(leye[1].y - leye[d].y) +
+    //     Math.abs(leye[1].x - leye[d].x)));
+    // }
+
+    // ai_engine.face_sp.mouth = 
+    var mouth_1 = face.landmarks.relativePositions[63];
+    var mouth_2 = face.landmarks.relativePositions[67];
+
+    ai_engine.face_sp.mouth = _dist(mouth_1, mouth_2) > 0.15;
+
+
+    var noseTip = face.landmarks.relativePositions[27];
+    var nose = face.landmarks.relativePositions[33];
+    var faceL = face.landmarks.relativePositions[1];
+    var faceR = face.landmarks.relativePositions[15];
+
+    var distL = Math.abs(nose.x - faceL.x);
+    var distR = Math.abs(nose.x - faceR.x);
+    // console.log(Math.abs(nose.x - faceL.x));
+    var turnRight = distL < 0.25 && distR > 0.5;
+    var turnLeft = distR < 0.25 && distL > 0.5;
+
+    var tiltLeft = nose.x - noseTip.x > 0.08;
+    var tiltRight = nose.x - noseTip.x < -0.08;
+
+    var tiltUp = nose.y < ((faceL.y + faceR.y) * 0.5) - 0.1;
+    var tiltDown = nose.y - (((faceL.y + faceR.y) * 0.5)) > 0.2;
+    // console.log(turnRight, turnLeft);
+    ai_engine.face_sp.tiltDown = tiltDown;
+    ai_engine.face_sp.tiltUp = tiltUp;
+    ai_engine.face_sp.tiltLeft = tiltLeft;
+    ai_engine.face_sp.tiltRight = tiltRight;
+    ai_engine.face_sp.turnRight = turnRight;
+    ai_engine.face_sp.turnLeft = turnLeft;
+    // console.log(tiltLeft, tiltRight, tiltUp, tiltDown);
+}
+
 function check_userMedia() {
     return !!navigator.getUserMedia;
 }
 if (!check_userMedia()) {
-    local_state.ai_engine.engine_state = -1; //error
+    ai_engine.engine_state = -1; //error
 } else {
     //face stuff
-    local_state.ai_engine.engine_state = 1;
+    ai_engine.engine_state = 1;
     local_state.loading = 1;
     Promise.all([
             faceapi.nets.tinyFaceDetector.loadFromUri("/models"),
             faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
-            faceapi.nets.faceExpressionNet.loadFromUri("/models"),
-            faceapi.nets.faceRecognitionNet.loadFromUri("/models")
+            faceapi.nets.faceLandmark68TinyNet.loadFromUri("/models"),
+            faceapi.nets.faceExpressionNet.loadFromUri("/models")
         ])
         .then(() => {
             var first = true;
@@ -366,7 +474,7 @@ if (!check_userMedia()) {
                     video: true
                 },
                 stream => {
-                    local_state.ai_engine.engine_state = 2; //good
+                    ai_engine.engine_state = 2; //good
                     facevid.srcObject = stream;
                     var vid = facevid;
                     var busy = false;
@@ -375,19 +483,23 @@ if (!check_userMedia()) {
                             .detectSingleFace(
                                 vid,
                                 new faceapi.TinyFaceDetectorOptions({
-                                    inputSize: 128,
-                                    scoreThreshold: 0.5
+                                    inputSize: 256,
+                                    scoreThreshold: 0.3
                                 })
                             )
+                            .withFaceLandmarks()
                             .withFaceExpressions()
                             .then(v => {
                                 if (first) {
                                     local_state.loading = 0;
                                 }
                                 first = false;
+                                ai_engine.face_data = v;
                                 if (v) {
-                                    local_state.ai_engine.face_data = local_state.ai_engine.face_data || {};
-                                    // console.log(v);
+                                    if (ai_engine.face_data) {
+                                        ai_engine.face_data_persist = ai_engine.face_data;
+                                    }
+                                    compute_face(ai_engine.face_data);
                                 }
                                 busy = false;
                             })
@@ -401,17 +513,19 @@ if (!check_userMedia()) {
                             });
                         busy = true;
                         //52346555
-                    }, 200);
+                    }, 300);
                 },
                 (e) => {
                     local_state.loading = 0;
                     alert("未允许视频权限，无法进行游戏");
                     alert(e);
-                    local_state.ai_engine.engine_state = -2; //error
+                    ai_engine.engine_state = -2; //error
                 }
             );
         })
         .catch(() => {
-            local_state.ai_engine.engine_state = -3; //error
+            ai_engine.engine_state = -3; //error
         });
 }
+
+

@@ -34,15 +34,19 @@
           <div class="btn" v-on:click="close_dialog('user')">关闭</div>
           <div class="btn" v-on:click="join_room('0')">返回Lobby</div>
           <div class="minor" style="margin-top: 1rem; font-size: 0.6em; font-weight: 300;">
-            <i>
-              用户配置将在这里
-            </i>
+            <i>用户配置将在这里</i>
+          </div>
+
+          <div class="minor" style="margin-top: 1rem; font-size: 0.6em; font-weight: 300;">
+            <i>调试 - 选择娃娃机控制器</i>
+          </div>
+          <div v-for="n, k in operators">
+            <div style="margin-top: 1rem;"></div>
+            <div v-bind:class="{btn:1, toggled: k == operator.controller}" v-on:click="set_controller_to(k)">{{n.pro_title}}</div>
           </div>
         </div>
       </div>
     </div>
-
-
 
     <div v-bind:class="{fs:true, show: local_state.dialog == 'help'}">
       <div class="mask" v-on:click="close_dialog('help')"></div>
@@ -55,9 +59,7 @@
         <div class="forms" style="position: relative; ">
           <div class="btn" v-on:click="close_dialog('help')">关闭</div>
           <div class="minor" style="margin-top: 1rem; font-size: 0.6em; font-weight: 300;">
-            <i>
-              玩法教学Placeholder
-            </i>
+            <i>玩法教学Placeholder</i>
           </div>
         </div>
       </div>
@@ -72,11 +74,14 @@ export default {
   data: function() {
     return shared.vueData;
   },
-  methods: shared.actions
+  methods: shared.combined_methods
 };
 </script>
 
 <style scoped>
+.fs {
+  z-index: 99;
+}
 .forms {
   padding-bottom: 1rem;
   padding: 1.5rem;
@@ -113,6 +118,12 @@ input {
   font-weight: bolder;
 }
 .btn:hover {
+  background: #07a5ee;
+  color: white;
+}
+.btn.toggled {
+  font-weight: bolder;
+  text-decoration: underline;
   background: #07a5ee;
   color: white;
 }

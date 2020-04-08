@@ -54,6 +54,10 @@ export default {
 </script>
 
 <style scoped>
+
+.fs {
+  z-index: 999;
+}
 .login {
   text-align: left;
 }
