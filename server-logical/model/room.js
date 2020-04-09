@@ -7,13 +7,13 @@ var presist = require("../lib/presist");
 var Observable = require("../lib/observer").Observable;
 var roomstates = Observable.from({}); //runtime stuff
 var roomdb = presist("rooms", {
-    demo_room: {
+    room1: {
         machine: "test_machine"
     },
-    demo_room2: {
-        machine: "test_machine2"
+    room2: {
+        machine: "real_machine"
     },
-    demo_room3: {
+    room3: {
         machine: "test_machine3"
     }
 });

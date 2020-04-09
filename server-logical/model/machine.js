@@ -7,35 +7,35 @@ var machinedb = presist("machine", {
         id: 'test_machine',
         public: {
             cost: 2,
-            title: "测试娃娃机1号",
-            intro: "混合礼品，随意抓取",
-            view_streams: ["ws://localhost:8082/"]
+            title: "逻辑测试",
+            intro: "永远“在线”，服务端模拟，用于测试",
+            view_streams: ["wss://emerge.ltd:8444/"]
         },
         private: {
             key: 38193, //optional
             token: "super_secret_key",
-            push_streams: ["http://localhost:8081/test"],
+            push_streams: ["http://emerge.cc:8081/test"],
         }
     },
-    test_machine2: {
-        id: 'test_machine2',
+    real_machine: {
+        id: 'real_machine',
         public: {
             cost: 2,
-            title: "测试娃娃机2号",
-            intro: "混合礼品，随意抓取",
-            view_streams: ["ws://localhost:8082/"]
+            title: "真机 #01",
+            intro: "!真机!",
+            view_streams: ["wss://emerge.ltd:8444/"]
         },
         private: {
             key: 38193, //optional
-            push_streams: ["http://localhost:8081/test"],
+            push_streams: ["http://emerge:8081/test"],
         }
     },
     test_machine3: {
         id: 'test_machine3',
         public: {
             cost: 2,
-            title: "测试娃娃机3号",
-            intro: "混合礼品，随意抓取",
+            title: "本地视频流",
+            intro: "非真机，用于调试视频流",
             view_streams: ["ws://localhost:8082/"]
         },
         private: {
