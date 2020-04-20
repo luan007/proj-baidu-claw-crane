@@ -13,7 +13,7 @@ setInterval(() => {
 
 machines.events.on("states", (changes) => {
     for (var i in machines.states) {
-        if (machines.states[i].user_on_request) {
+        if (machines.states[i].user_on_request && i == 'test_machine') {
             ((i) => {
                 //start a session
                 var sess = {

@@ -108,7 +108,7 @@ var mapper = {
     r: "right",
     u: "up",
     d: "bottom",
-    pick: "grab"
+    push: "grab"
 };
 
 loop(() => {
@@ -121,6 +121,7 @@ loop(() => {
         }
     }
     if (changed) {
+        console.log(JSON.stringify(cmd_built));
         actions.send_cmd(cmd_built);
     }
 });

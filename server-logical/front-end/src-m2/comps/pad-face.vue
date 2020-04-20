@@ -179,7 +179,7 @@ abstract_controller(
   }
 );
 
-shared.vueData.operator.controller = "mouth";
+shared.vueData.operator.controller = "emo";
 var prev_controller = "";
 loop(() => {
   var cur_controller = shared.vueData.operator.controller;

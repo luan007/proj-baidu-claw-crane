@@ -346,13 +346,13 @@ app.post("/actions/add_coin", (req, res) => {
 app.post("/actions/start_game/:machine_id", (req, res) => {
     var sess = sessions.request_new_session(req.user.uid, req.params.machine_id);
     console.log("Starting", sess);
-    if (sess) {
+    if (sess > 0) {
         return res.json({
             result: "OK"
         }).end();
     } else {
         return res.json({
-            error: "Error " + sess
+            error: sess
         }).end();
     }
 });

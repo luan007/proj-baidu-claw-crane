@@ -110,6 +110,7 @@ loop(() => {
 });
 
 shared.actions.set_op_push = function(o) {
+  console.log(o);
   shared.vueData.operator.push = o;
 };
 export default {

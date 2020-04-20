@@ -1,5 +1,5 @@
 import io from "socket.io-client";
-export var main_socket = io(":9797")
+export var main_socket = io("/");
 
 export var synced = {
     machines: {},
@@ -227,7 +227,11 @@ export var actions = {
         // /actions/start_game/:machine_id
         request_promise("start_game/" + machine_id).then(v => {
             if (v.error) {
-                alert(v.error);
+                if(v.error == -5) {
+                    alert("硬币不足～请充值");
+                } else {
+                    alert("设备或网络原因，上机失败");
+                }
             }
         }).catch(e => {
             alert(e);
@@ -333,14 +337,12 @@ export var actions = {
     current_room_state() {
         try {
             return synced.room_states[synced.state.room_id];
-        } catch (e) {
-        }
+        } catch (e) {}
     },
     current_room_session() {
         try {
             return actions.current_room_state().session;
-        } catch (e) {
-        }
+        } catch (e) {}
     },
     current_machine_id() {
         try {
@@ -375,8 +377,18 @@ import {
 } from "./libao_stripped";
 export var facevid = document.createElement('video');
 document.body.appendChild(facevid);
-facevid.style.visibility = 'hidden'
+
+
+facevid.style.visibility;// = 'hidden'
+facevid.style.position = "fixed";
+facevid.style["z-index"] = -9999;
+facevid.style["pointer-events"] = "none";
+facevid.style.top = 0;
+facevid.style.bottom = 0;
+facevid.style.left = 0;
+facevid.style.right = 0;
 facevid.muted = true;
+facevid.setAttribute('playsinline', '');
 facevid.autoplay = true;
 
 function _dist(a, b) {
@@ -454,9 +466,10 @@ function compute_face(face) {
 }
 
 function check_userMedia() {
-    return !!navigator.getUserMedia;
+    return !!navigator.getUserMedia || !!navigator.mediaDevices;
 }
 if (!check_userMedia()) {
+    alert("为支持人脸识别，请尝试用系统浏览器打开");
     ai_engine.engine_state = -1; //error
 } else {
     //face stuff
@@ -470,62 +483,70 @@ if (!check_userMedia()) {
         ])
         .then(() => {
             var first = true;
-            navigator.getUserMedia({
-                    video: true
-                },
-                stream => {
-                    ai_engine.engine_state = 2; //good
-                    facevid.srcObject = stream;
-                    var vid = facevid;
-                    var busy = false;
-                    setInterval(v => {
-                        faceapi
-                            .detectSingleFace(
-                                vid,
-                                new faceapi.TinyFaceDetectorOptions({
-                                    inputSize: 256,
-                                    scoreThreshold: 0.3
-                                })
-                            )
-                            .withFaceLandmarks()
-                            .withFaceExpressions()
-                            .then(v => {
-                                if (first) {
-                                    local_state.loading = 0;
-                                }
-                                first = false;
-                                ai_engine.face_data = v;
-                                if (v) {
-                                    if (ai_engine.face_data) {
-                                        ai_engine.face_data_persist = ai_engine.face_data;
-                                    }
-                                    compute_face(ai_engine.face_data);
-                                }
-                                busy = false;
+            var on_success = stream => {
+                ai_engine.engine_state = 2; //good
+                facevid.srcObject = stream;
+                var vid = facevid;
+                var busy = false;
+                setInterval(v => {
+                    faceapi
+                        .detectSingleFace(
+                            vid,
+                            new faceapi.TinyFaceDetectorOptions({
+                                inputSize: 256,
+                                scoreThreshold: 0.3
                             })
-                            .catch(e => {
-                                if (first) {
-                                    local_state.loading = 0;
+                        )
+                        .withFaceLandmarks()
+                        .withFaceExpressions()
+                        .then(v => {
+                            if (first) {
+                                local_state.loading = 0;
+                            }
+                            first = false;
+                            ai_engine.face_data = v;
+                            if (v) {
+                                if (ai_engine.face_data) {
+                                    ai_engine.face_data_persist = ai_engine.face_data;
                                 }
-                                first = false;
-                                busy = false;
-                                // console.log(e);
-                            });
-                        busy = true;
-                        //52346555
-                    }, 300);
-                },
-                (e) => {
-                    local_state.loading = 0;
-                    alert("未允许视频权限，无法进行游戏");
-                    alert(e);
-                    ai_engine.engine_state = -2; //error
-                }
-            );
+                                compute_face(ai_engine.face_data);
+                            }
+                            busy = false;
+                        })
+                        .catch(e => {
+                            if (first) {
+                                local_state.loading = 0;
+                            }
+                            first = false;
+                            busy = false;
+                            // console.log(e);
+                        });
+                    busy = true;
+                    //52346555
+                }, 300);
+            };
+            var onerror = (e) => {
+                local_state.loading = 0;
+                alert("未允许视频权限，无法进行游戏");
+                alert(e);
+                ai_engine.engine_state = -2; //error
+            };
+
+            if (navigator.getUserMedia) {
+                navigator.getUserMedia({
+                    video: true,
+                    audio: false
+                }, on_success, onerror);
+            } else {
+                navigator.mediaDevices.getUserMedia({
+                        video: true,
+                        audio: false
+                    })
+                    .then(on_success)
+                    .catch(onerror);
+            }
         })
         .catch(() => {
             ai_engine.engine_state = -3; //error
         });
 }
-
-

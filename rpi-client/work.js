@@ -2,9 +2,9 @@ var stream_pusher = require("./stream_pusher")
 
 var sockio = require("socket.io-client");
 var obs = require("./observer").Observable;
-var io = sockio("http://localhost:9898", {
+var io = sockio("http://emerge.cc:9898", {
     query: {
-        token: "super_secret_key"
+        token: "real_machine_token"
     }
 })
 
@@ -19,9 +19,12 @@ var local_state = obs.from({
     session: null
 });
 
-io.on("error", console.log);
+io.on("error", (e)=>{
+    console.log("error", e)
+});
 
 io.on("state", function (_s) {
+    // console.log(_s);
     for (var i in _s) {
         machine.state[i] = _s[i];
     }
@@ -42,9 +45,17 @@ setInterval(() => {
     io.emit("report", {})
 }, 1000);
 
+
+var last_start = Date.now();
 function start_game(g) {
+    if(Date.now() - last_start < 2000) {
+        local_state.user_on_request = false;
+        return;
+    }
+    console.log("starting game");
     if (!local_state.user_on_request) return;
     send_cmd(cmd_add_coin(1));
+    last_start = Date.now();
     local_state.session = {
         started: Date.now(),
         ended: 0,
@@ -85,6 +96,7 @@ local_state.observe(v => {
             //
             if (local_state.user_on_request) {
                 start_game();
+                local_state.user_on_request = false;
             }
         }
     });
@@ -94,7 +106,7 @@ local_state.observe(v => {
 
 function check_game_over() {
     var ended = 0;
-    console.log(local_state.session);
+    // console.log(local_state.session);
     if (local_state.session && !local_state.session.end) {
         if (local_state.session.countdown == 0) {
             // ended = 1;
@@ -209,7 +221,7 @@ function checksum(pack) {
 function send_cmd(buffer) {
     port.write(buffer);
     port.flush();
-    console.log(buffer);
+    // console.log(buffer);
 }
 
 var ctrl_cmd = obs.from({});
@@ -261,7 +273,7 @@ io.on("ctrl", (ctrl) => {
 });
 
 port.on("open", () => {
-    console.log("serial port started");
+    // console.log("serial port started");
 
     // ` 01 00 78 2f 05 28 00 03 00 00 01 3c 00 00 01 3c 00 04 04 04 3c`
     // ` 01 0f 00 20 00 04 05 00 05 00 01 3c 00 00 01 3c 00 04 04 04 3c`

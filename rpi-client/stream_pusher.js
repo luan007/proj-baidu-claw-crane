@@ -6,6 +6,7 @@ function start_worker(stream) {
         return;
     }
     streams.push(stream);
+    console.log("sh " + process.cwd() + "/ffmpeg-osx-push.sh " + stream);
     child_process.exec("sh " + process.cwd() + "/ffmpeg-osx-push.sh " + stream);
 }
 
