@@ -544,7 +544,8 @@ if (!check_userMedia()) {
                         .detectSingleFace(
                             vid,
                             new faceapi.TinyFaceDetectorOptions({
-                                inputSize: 256,
+                                // inputSize: 256,
+                                inputSize: 128,
                                 scoreThreshold: 0.3
                             })
                         )
@@ -574,7 +575,7 @@ if (!check_userMedia()) {
                         });
                     busy = true;
                     //52346555
-                }, 500);
+                }, 300);
             };
             var onerror = (e) => {
                 local_state.loading = 0;
