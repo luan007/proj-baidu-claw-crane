@@ -574,7 +574,7 @@ if (!check_userMedia()) {
                         });
                     busy = true;
                     //52346555
-                }, 300);
+                }, 500);
             };
             var onerror = (e) => {
                 local_state.loading = 0;
