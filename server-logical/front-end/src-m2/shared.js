@@ -8,7 +8,6 @@ export var actions = shared_actions.actions
 export var facevid = shared_actions.facevid;
 export var ai_engine = shared_actions.ai_engine;
 
-
 import * as three from "three"
 import {
     GLTFLoader
@@ -46,8 +45,6 @@ export var vueData = {
     synced: shared_actions.synced,
     local_state: shared_actions.local_state
 };
-
-
 
 
 window.vueData = vueData;
@@ -121,7 +118,7 @@ loop(() => {
         }
     }
     if (changed) {
-        console.log(JSON.stringify(cmd_built));
+        // console.log(JSON.stringify(cmd_built));
         actions.send_cmd(cmd_built);
     }
 });

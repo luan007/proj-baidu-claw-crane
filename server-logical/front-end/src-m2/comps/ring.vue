@@ -40,6 +40,16 @@
           </div>
         </div>
       </div>
+
+      <div
+        v-show="local_state.ai_engine.main_expr"
+        v-on:click="send_emoji(local_state.ai_engine.main_expr)"
+        v-bind:class="{throw_coin: true, emoji_sender: true, show: !is_in_game()}"
+      >
+        <div style="position:Absolute; top:50%; left: 0; right: 0; transform:translateY(-50%)">
+          <emojisender></emojisender>
+        </div>
+      </div>
     </div>
 
     <div
@@ -128,6 +138,24 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.throw_coin.emoji_sender {
+  opacity: 0;
+  left: 0px;
+  top: 0px;
+  height: 80px;
+  background: #ffffff;
+  width: 80px;
+  animation: none;
+  border-width: 5px;
+  color: #000000;
+  border-radius: 80px;
+  pointer-events: none;
+  border-color: #000000;
+}
+.throw_coin.emoji_sender.show {
+  pointer-events: all;
+  opacity: 1;
+}
 .throw_coin.back {
   opacity: 0;
   left: -140px;
@@ -189,13 +217,13 @@ export default {
   left: -140px;
   top: -50px;
 }
-.throw_coin:hover {
-  top: -45px;
-  color: #ff9c01;
-  background: white;
+// .throw_coin:hover {
+//   top: -45px;
+//   color: #ff9c01;
+//   background: white;
 
-  box-shadow: 0 5px 0 rgba(0, 0, 0, 0);
-}
+//   box-shadow: 0 5px 0 rgba(0, 0, 0, 0);
+// }
 .pad-title {
   position: absolute;
   bottom: -100px;
@@ -332,8 +360,8 @@ export default {
 }
 .aux {
   position: absolute;
-      top: 110px;
-    right: -90px;
+  top: 110px;
+  right: -90px;
   width: 70px;
   height: 70px;
   background: black;

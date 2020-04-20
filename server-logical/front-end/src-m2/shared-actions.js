@@ -33,6 +33,15 @@ export var ai_engine = {
 
 export var local_state = {
     dialog: "",
+    chats: [],
+    emojimap: {
+        "disgusted": "🤨",
+        "angry": "💪",
+        "happy": "😂",
+        "neutral": "👏",
+        "sad": "😣",
+        "surprised": "😱"
+    },
     ai_engine: ai_engine,
     generic_error: "",
     channel: {
@@ -50,6 +59,34 @@ export var local_state = {
     loading: false,
     synced: synced
 };
+
+main_socket.on("chat", e => {
+    local_state.chats.push({
+        pack: e,
+        pos: {
+            x: 100,
+            y: Math.random() * 100
+        },
+        rpos: {
+            x: Math.random() * 100,
+            y: Math.random() * 100
+        },
+        life: 1,
+        life_speed: Math.random() * 0.05 + 0.01,
+        speed: (Math.random() + 1) * .5
+    });
+});
+
+loop(() => {
+    for (var i = 0; i < local_state.chats.length; i++) {
+        local_state.chats[i].pos.x -= local_state.chats[i].speed;
+        // local_state.chats[i].life -= local_state.chats[i].life_speed;
+        if (local_state.chats[i].pos.x < -110 || local_state.chats[i].life < 0) {
+            local_state.chats.splice(i, 1);
+            i++;
+        }
+    }
+});
 
 export function active_game_in_room() {
     console.log(synced.state, synced.state.session)
@@ -227,7 +264,7 @@ export var actions = {
         // /actions/start_game/:machine_id
         request_promise("start_game/" + machine_id).then(v => {
             if (v.error) {
-                if(v.error == -5) {
+                if (v.error == -5) {
                     alert("硬币不足～请充值");
                 } else {
                     alert("设备或网络原因，上机失败");
@@ -258,7 +295,21 @@ export var actions = {
         });
     },
     send_chat: (pack) => {
+        pack = pack || {
+            emoji: "test"
+        };
         main_socket.emit("chat", pack);
+    },
+    send_emoji: (emoji) => {
+        // pack = pack || {
+        //     emoji: "test"
+        // };
+        var emo = local_state.emojimap[emoji];
+        if(!emo) return;
+        main_socket.emit("chat", {
+            emoji: emo
+        });
+        console.log(emoji);
     },
     set_loading() {
         local_state.loading = 1;
@@ -379,7 +430,7 @@ export var facevid = document.createElement('video');
 document.body.appendChild(facevid);
 
 
-facevid.style.visibility;// = 'hidden'
+facevid.style.visibility; // = 'hidden'
 facevid.style.position = "fixed";
 facevid.style["z-index"] = -9999;
 facevid.style["pointer-events"] = "none";
@@ -534,12 +585,16 @@ if (!check_userMedia()) {
 
             if (navigator.getUserMedia) {
                 navigator.getUserMedia({
-                    video: true,
+                    video: {
+                        facingMode: 'user'
+                    },
                     audio: false
                 }, on_success, onerror);
             } else {
                 navigator.mediaDevices.getUserMedia({
-                        video: true,
+                        video: {
+                            facingMode: 'user'
+                        },
                         audio: false
                     })
                     .then(on_success)

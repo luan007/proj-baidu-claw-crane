@@ -22,7 +22,7 @@ var mesh = new three.Mesh(geo, mat);
 group.add(mesh);
 
 loop(() => {
-    var sc = Math.pow(xpand + 0.01, 2); 
+    var sc = Math.pow(xpand + 0.01, 2) * 2; 
     mesh.rotation.set(xpand * 2.5, xpand * 5.2, xpand * 0.05);
     mesh.scale.set(sc, sc, sc);
     mesh.visible = xpand > 0.01;
