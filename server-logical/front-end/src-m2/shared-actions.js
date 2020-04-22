@@ -545,7 +545,7 @@ if (!check_userMedia()) {
                             vid,
                             new faceapi.TinyFaceDetectorOptions({
                                 // inputSize: 256,
-                                inputSize: 128,
+                                inputSize: 256,
                                 scoreThreshold: 0.3
                             })
                         )

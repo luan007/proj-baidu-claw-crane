@@ -179,6 +179,8 @@ export default {
   top: 0;
   bottom: 0;
   right: 0;
+  transform-origin: 50% 50%;
+  transform: scaleX(0.75) scaleY(1.3333) rotate(90deg);
 }
 .video_shell .video_holder:after {
   content: " ";
